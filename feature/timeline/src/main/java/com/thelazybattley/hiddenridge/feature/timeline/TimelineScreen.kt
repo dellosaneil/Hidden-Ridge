@@ -1,16 +1,11 @@
 package com.thelazybattley.hiddenridge.feature.timeline
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -24,11 +19,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.thelazybattley.hiddenridge.core.designsystem.theme.HiddenRidgeTheme
-import com.thelazybattley.hiddenridge.feature.timeline.components.BackToTodayButton
 import com.thelazybattley.hiddenridge.feature.timeline.components.MonthRail
 import com.thelazybattley.hiddenridge.feature.timeline.components.TimelineDimens
 import com.thelazybattley.hiddenridge.feature.timeline.components.TimelineGrid
@@ -115,13 +108,6 @@ private fun TimelineReady(
     val activeMonthIndex by remember(timeline, dayPx) {
         derivedStateOf { timeline.monthIndexAt(firstVisibleDay(horizontalScroll, dayPx) + ACTIVE_MONTH_PROBE_DAYS) }
     }
-    val todayVisible by remember(timeline.todayIndex, dayPx) {
-        derivedStateOf { isDayVisible(timeline.todayIndex, horizontalScroll, dayPx) }
-    }
-    val todayIsAhead by remember(timeline.todayIndex, dayPx) {
-        derivedStateOf { timeline.todayIndex > firstVisibleDay(horizontalScroll, dayPx) }
-    }
-
     Column(Modifier.fillMaxSize()) {
         TimelineTopBar(
             houseCount = timeline.houseCount,
@@ -139,55 +125,21 @@ private fun TimelineReady(
         )
         TimelineLegend()
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-        Box(Modifier.weight(1f)) {
-            TimelineGrid(
-                timeline = timeline,
-                horizontalScroll = horizontalScroll,
-                onBookingClick = onBookingClick,
-                onEmptyDayClick = onEmptyDayClick,
-                modifier = Modifier.fillMaxSize(),
-            )
-            BackToTodayOverlay(
-                visible = !todayVisible,
-                today = timeline.today,
-                todayIsAhead = todayIsAhead,
-                onClick = scrollToToday,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 16.dp),
-            )
-        }
-    }
-}
-
-@Composable
-private fun BackToTodayOverlay(
-    visible: Boolean,
-    today: LocalDate,
-    todayIsAhead: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn() + slideInVertically { it / 2 },
-        exit = fadeOut() + slideOutVertically { it / 2 },
-        modifier = modifier,
-    ) {
-        BackToTodayButton(today = today, todayIsAhead = todayIsAhead, onClick = onClick)
+        TimelineGrid(
+            timeline = timeline,
+            horizontalScroll = horizontalScroll,
+            onBookingClick = onBookingClick,
+            onEmptyDayClick = onEmptyDayClick,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+        )
     }
 }
 
 private fun scrollOffsetFor(dayIndex: Int, dayPx: Float): Int = (dayIndex.coerceAtLeast(0) * dayPx).roundToInt()
 
 private fun firstVisibleDay(scroll: ScrollState, dayPx: Float): Int = (scroll.value / dayPx).toInt()
-
-/** Before the first layout the viewport is unknown; treat today as visible so nothing flickers in. */
-private fun isDayVisible(dayIndex: Int, scroll: ScrollState, dayPx: Float): Boolean {
-    if (scroll.viewportSize == 0) return true
-    val dayCenter = (dayIndex + 0.5f) * dayPx
-    return dayCenter >= scroll.value && dayCenter <= scroll.value + scroll.viewportSize
-}
 
 @Preview(showBackground = true, widthDp = 390, heightDp = 760)
 @Composable

@@ -8,7 +8,6 @@
     <string name="timeline_new_booking">New</string>
     <string name="timeline_today">Today</string>
     <string name="timeline_go_to_today">Go to today, %1$s</string>
-    <string name="timeline_back_to_today">Today · %1$s</string>
     <string name="timeline_house_column">House</string>
 
     <string name="timeline_group_cabins">Cabins</string>
