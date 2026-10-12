@@ -5,14 +5,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -52,27 +49,6 @@ private fun diagonalStripes(stripe: Color, gap: Color, stripeWidth: Float, perio
         start = Offset.Zero,
         end = Offset(step, step),
         tileMode = TileMode.Repeated,
-    )
-}
-
-/** A dashed outline, used for anything on hold. */
-internal fun Modifier.dashedBorder(
-    width: Dp,
-    color: Color,
-    cornerRadius: Dp,
-    dashLength: Dp = 5.dp,
-    gapLength: Dp = 3.dp,
-): Modifier = drawBehind {
-    val stroke = width.toPx()
-    drawRoundRect(
-        color = color,
-        topLeft = Offset(stroke / 2, stroke / 2),
-        size = Size(size.width - stroke, size.height - stroke),
-        cornerRadius = CornerRadius(cornerRadius.toPx()),
-        style = Stroke(
-            width = stroke,
-            pathEffect = PathEffect.dashPathEffect(floatArrayOf(dashLength.toPx(), gapLength.toPx())),
-        ),
     )
 }
 

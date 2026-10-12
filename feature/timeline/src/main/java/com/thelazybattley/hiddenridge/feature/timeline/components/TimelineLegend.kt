@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.thelazybattley.hiddenridge.core.designsystem.component.dashedBorder
 import com.thelazybattley.hiddenridge.feature.timeline.R
 
 private val SwatchShape = RoundedCornerShape(3.dp)

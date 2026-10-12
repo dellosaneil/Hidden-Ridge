@@ -1,6 +1,8 @@
 package com.thelazybattley.hiddenridge.core.data.repository
 
 import com.thelazybattley.hiddenridge.core.data.mapper.toDomain
+import com.thelazybattley.hiddenridge.core.data.mapper.toEntity
+import com.thelazybattley.hiddenridge.core.data.mapper.toHouseRefs
 import com.thelazybattley.hiddenridge.core.database.dao.BookingDao
 import com.thelazybattley.hiddenridge.core.database.entity.BookingWithHouses
 import com.thelazybattley.hiddenridge.core.domain.model.Booking
@@ -22,6 +24,10 @@ internal class OfflineBookingRepository @Inject constructor(
 
     override fun observeBooking(bookingId: String): Flow<Booking?> =
         bookingDao.observeById(bookingId).map { it?.toDomain() }
+
+    override suspend fun createBooking(booking: Booking) {
+        bookingDao.upsertAll(bookings = listOf(booking.toEntity()), bookingHouses = booking.toHouseRefs())
+    }
 
     override suspend fun updateStatus(bookingId: String, status: BookingStatus, holdUntil: LocalDate?) {
         bookingDao.updateStatus(id = bookingId, status = status.name, holdUntil = holdUntil)

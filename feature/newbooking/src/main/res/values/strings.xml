@@ -1,0 +1,122 @@
+<resources>
+    <string name="new_booking_title">New booking</string>
+    <string name="action_save">Save</string>
+    <string name="action_discard">Discard and close</string>
+
+    <string name="section_booking_type">Booking type</string>
+    <string name="mode_individual">Individual houses</string>
+    <string name="mode_whole_resort">Whole resort</string>
+    <string name="mode_individual_hint">Book one or more houses for this guest or group.</string>
+    <string name="mode_whole_resort_hint">One group takes every house. All houses are blocked for these dates.</string>
+
+    <string name="section_dates">Dates</string>
+    <plurals name="nights">
+        <item quantity="one">%1$d night</item>
+        <item quantity="other">%1$d nights</item>
+    </plurals>
+    <string name="field_check_in">Check-in</string>
+    <string name="field_check_out">Check-out</string>
+    <string name="field_tap_a_date">Tap a date</string>
+    <string name="field_not_set">Not set</string>
+    <string name="length_of_stay">Length of stay</string>
+    <string name="calendar_previous_month">Previous month</string>
+    <string name="calendar_next_month">Next month</string>
+    <string name="calendar_choose_month">Choose a month</string>
+    <string name="calendar_year">Year</string>
+    <string name="calendar_blocked_legend">Night already booked for what you selected</string>
+    <string name="calendar_day_booked">%1$s, already booked</string>
+
+    <string name="section_houses">Houses</string>
+    <plurals name="houses_selected">
+        <item quantity="one">%1$d house selected</item>
+        <item quantity="other">%1$d houses selected</item>
+    </plurals>
+    <string name="house_type">House type</string>
+    <string name="house_type_cabins">Cabins</string>
+    <string name="house_type_casitas">Casitas</string>
+    <string name="house_type_family">Family</string>
+    <string name="house_type_sleeps">Sleeps %1$d</string>
+    <string name="house_type_sleeps_free">Sleeps %1$d · %2$d free</string>
+    <string name="house_status_pick_dates">Pick dates first</string>
+    <string name="house_status_free">Free</string>
+    <string name="house_status_selected">Selected · free</string>
+    <string name="house_status_taken">%1$s · %2$s</string>
+    <string name="house_status_whole_resort">Whole resort</string>
+    <string name="house_tile_description">%1$s, %2$s</string>
+    <string name="houses_hint">Booking a group? Tap more houses, or switch type to add another kind.</string>
+    <string name="houses_selected_hint">Selected: %1$s. Booking a group? Tap more houses, or switch type to add another kind.</string>
+    <plurals name="resort_all_blocked">
+        <item quantity="one">%1$d house blocked</item>
+        <item quantity="other">All %1$d houses blocked</item>
+    </plurals>
+    <string name="resort_blocked_detail">%1$s. Nobody else can book a house inside these dates.</string>
+    <plurals name="count_cabins">
+        <item quantity="one">%1$d cabin</item>
+        <item quantity="other">%1$d cabins</item>
+    </plurals>
+    <plurals name="count_casitas">
+        <item quantity="one">%1$d casita</item>
+        <item quantity="other">%1$d casitas</item>
+    </plurals>
+    <plurals name="count_family_houses">
+        <item quantity="one">%1$d family house</item>
+        <item quantity="other">%1$d family houses</item>
+    </plurals>
+
+    <string name="section_guest">Guest</string>
+    <string name="field_guest_name">Guest or group name</string>
+    <string name="field_phone">Phone</string>
+    <string name="field_guests">Guests</string>
+    <string name="guests_fewer">Fewer guests</string>
+    <string name="guests_more">More guests</string>
+    <string name="capacity_selected">Selected houses sleep %1$d.</string>
+    <string name="capacity_selected_over">Selected houses sleep %1$d. Add a house or check the guest count.</string>
+    <string name="capacity_resort">The whole resort sleeps %1$d.</string>
+    <string name="capacity_resort_over">The whole resort sleeps %1$d. Check the guest count.</string>
+    <string name="section_status">Status</string>
+    <string name="status_confirmed">Confirmed</string>
+    <string name="status_hold">Hold</string>
+    <string name="hold_explainer">A hold keeps %1$s for this guest but stays unconfirmed. It shows as a dashed bar on the timeline.</string>
+    <string name="hold_the_whole_resort">the whole resort</string>
+    <string name="hold_the_houses">the houses</string>
+    <string name="hold_release_label">Release the hold if not confirmed after</string>
+    <string name="hold_1_day">1 day</string>
+    <string name="hold_3_days">3 days</string>
+    <string name="hold_1_week">1 week</string>
+    <string name="hold_releases_on">Releases on %1$s unless you confirm it.</string>
+    <string name="field_note">Note for staff</string>
+
+    <string name="footer_choose">Choose dates, then houses.</string>
+    <string name="footer_summary">%1$s · %2$s · %3$s</string>
+    <string name="footer_summary_on_hold">%1$s · %2$s · %3$s · on hold</string>
+    <plurals name="footer_houses">
+        <item quantity="one">%1$d house</item>
+        <item quantity="other">%1$d houses</item>
+    </plurals>
+    <plurals name="footer_all_houses">
+        <item quantity="one">%1$d house</item>
+        <item quantity="other">all %1$d houses</item>
+    </plurals>
+    <plurals name="conflict_title">
+        <item quantity="one">%1$d booking already uses these dates</item>
+        <item quantity="other">%1$d bookings already use these dates</item>
+    </plurals>
+    <string name="conflict_line">%1$s · %2$s · %3$s</string>
+    <string name="conflict_whole_resort">whole resort</string>
+    <string name="conflict_more">and %1$d more</string>
+    <string name="conflict_hint_resort">Pick other dates, or move those bookings first.</string>
+    <string name="conflict_hint_houses">Pick other dates or a free house.</string>
+
+    <string name="problem_missing_check_in">Pick a check-in date.</string>
+    <string name="problem_check_in_in_past">Check-in can\'t be in the past.</string>
+    <string name="problem_missing_check_out">Pick a check-out date.</string>
+    <string name="problem_no_houses">Choose at least one house.</string>
+    <string name="problem_missing_guest_name">Add the guest or group name.</string>
+    <string name="problem_no_guests">Add at least one guest.</string>
+    <string name="error_guest_name">Enter a name so staff can find this booking.</string>
+
+    <string name="create_booking">Create booking</string>
+    <string name="create_hold">Create hold</string>
+    <string name="message_booked">Booked %1$s · %2$s</string>
+    <string name="message_held">Holding %1$s · %2$s</string>
+</resources>

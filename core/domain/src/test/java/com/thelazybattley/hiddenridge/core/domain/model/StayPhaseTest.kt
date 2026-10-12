@@ -1,6 +1,5 @@
 package com.thelazybattley.hiddenridge.core.domain.model
 
-import com.thelazybattley.hiddenridge.core.domain.usecase.PutBookingOnHoldUseCase
 import java.time.LocalDate
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -20,9 +19,10 @@ class StayPhaseTest {
 
     @Test
     fun `a new hold lasts three days but never past check-in`() {
-        assertEquals(today.plusDays(3), PutBookingOnHoldUseCase.holdUntil(today, checkIn = today.plusDays(10)))
-        assertEquals(today.plusDays(1), PutBookingOnHoldUseCase.holdUntil(today, checkIn = today.plusDays(1)))
-        assertEquals(today, PutBookingOnHoldUseCase.holdUntil(today, checkIn = today.minusDays(1)))
+        assertEquals(today.plusDays(3), HoldRelease.date(today, checkIn = today.plusDays(10)))
+        assertEquals(today.plusDays(1), HoldRelease.date(today, checkIn = today.plusDays(1)))
+        assertEquals(today, HoldRelease.date(today, checkIn = today.minusDays(1)))
+        assertEquals(today.plusDays(7), HoldRelease.date(today, checkIn = today.plusDays(30), afterDays = 7))
     }
 
     private fun stay(from: Long, to: Long) = Booking(

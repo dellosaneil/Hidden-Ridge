@@ -7,13 +7,16 @@ import androidx.navigation.compose.NavHost
 import com.thelazybattley.hiddenridge.feature.bookingdetails.navigation.bookingDetailsSheet
 import com.thelazybattley.hiddenridge.feature.bookingdetails.navigation.closeBookingDetails
 import com.thelazybattley.hiddenridge.feature.bookingdetails.navigation.navigateToBookingDetails
+import com.thelazybattley.hiddenridge.feature.newbooking.navigation.closeNewBooking
+import com.thelazybattley.hiddenridge.feature.newbooking.navigation.navigateToNewBooking
+import com.thelazybattley.hiddenridge.feature.newbooking.navigation.newBookingSheet
 import com.thelazybattley.hiddenridge.feature.timeline.navigation.TimelineRoute
 import com.thelazybattley.hiddenridge.feature.timeline.navigation.timelineScreen
 
 /**
  * @param onShowMessage shows a short confirmation, such as after a booking is cancelled.
  * @param onNotBuiltYet called for destinations whose screens don't exist yet
- *   (new booking, reschedule, move, edit, availability, month picker).
+ *   (reschedule, move, edit, availability, month picker).
  */
 @Composable
 fun HiddenRidgeNavHost(
@@ -33,8 +36,8 @@ fun HiddenRidgeNavHost(
     ) {
         timelineScreen(
             onBookingClick = navController::navigateToBookingDetails,
-            onEmptyDayClick = { _, _ -> onNotBuiltYet() },
-            onNewBookingClick = onNotBuiltYet,
+            onEmptyDayClick = { houseId, date -> navController.navigateToNewBooking(houseId = houseId, checkIn = date) },
+            onNewBookingClick = { navController.navigateToNewBooking() },
             onCheckAvailabilityClick = onNotBuiltYet,
             onMonthTitleClick = onNotBuiltYet,
         )
@@ -43,6 +46,10 @@ fun HiddenRidgeNavHost(
             onReschedule = leaveBookingDetailsFor,
             onMove = leaveBookingDetailsFor,
             onEditDetails = leaveBookingDetailsFor,
+            onShowMessage = onShowMessage,
+        )
+        newBookingSheet(
+            onDismiss = navController::closeNewBooking,
             onShowMessage = onShowMessage,
         )
     }

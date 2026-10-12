@@ -13,6 +13,8 @@ interface BookingRepository {
     /** The booking with [bookingId] in any status, or null once it no longer exists. */
     fun observeBooking(bookingId: String): Flow<Booking?>
 
+    suspend fun createBooking(booking: Booking)
+
     suspend fun updateStatus(bookingId: String, status: BookingStatus, holdUntil: LocalDate?)
 
     suspend fun deleteBooking(bookingId: String)

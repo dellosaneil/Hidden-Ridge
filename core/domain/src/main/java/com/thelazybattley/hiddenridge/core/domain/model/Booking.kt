@@ -48,4 +48,10 @@ data class Booking(
 
     /** A single guest or group spread across several specific houses. */
     val isGroup: Boolean get() = !isWholeResort && houseIds.size > 1
+
+    /** Whether any night of this stay falls between [from] and [until] (exclusive). */
+    fun overlaps(from: LocalDate, until: LocalDate): Boolean = checkIn.isBefore(until) && from.isBefore(checkOut)
+
+    /** Whether the guest sleeps here on the night of [night]. */
+    fun coversNight(night: LocalDate): Boolean = !night.isBefore(checkIn) && night.isBefore(checkOut)
 }

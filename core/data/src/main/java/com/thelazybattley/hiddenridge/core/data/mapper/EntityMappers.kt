@@ -1,5 +1,7 @@
 package com.thelazybattley.hiddenridge.core.data.mapper
 
+import com.thelazybattley.hiddenridge.core.database.entity.BookingEntity
+import com.thelazybattley.hiddenridge.core.database.entity.BookingHouseCrossRef
 import com.thelazybattley.hiddenridge.core.database.entity.BookingWithHouses
 import com.thelazybattley.hiddenridge.core.database.entity.HouseEntity
 import com.thelazybattley.hiddenridge.core.domain.model.Booking
@@ -13,6 +15,22 @@ internal fun HouseEntity.toDomain(): House = House(
     name = name,
     type = HouseType.valueOf(type),
 )
+
+internal fun Booking.toEntity(): BookingEntity = BookingEntity(
+    id = id,
+    guestName = guestName,
+    mode = mode.name,
+    status = status.name,
+    checkIn = checkIn,
+    checkOut = checkOut,
+    holdUntil = holdUntil,
+    guestCount = guestCount,
+    phone = phone,
+    note = note,
+)
+
+internal fun Booking.toHouseRefs(): List<BookingHouseCrossRef> =
+    houseIds.map { houseId -> BookingHouseCrossRef(bookingId = id, houseId = houseId) }
 
 internal fun BookingWithHouses.toDomain(): Booking = Booking(
     id = booking.id,
