@@ -22,5 +22,12 @@ dependencyResolutionManagement {
     }
 }
 
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 rootProject.name = "HiddenRidge"
 include(":app")
+include(":core:domain")
+include(":core:database")
+include(":core:data")
+include(":core:designsystem")
+include(":feature:timeline")
