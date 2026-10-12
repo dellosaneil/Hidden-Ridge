@@ -36,6 +36,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.thelazybattley.hiddenridge.core.designsystem.format.DateFormats
+import com.thelazybattley.hiddenridge.core.designsystem.format.currentLocale
 import com.thelazybattley.hiddenridge.feature.timeline.BookingBar
 import com.thelazybattley.hiddenridge.feature.timeline.R
 import com.thelazybattley.hiddenridge.feature.timeline.ResortBlock
@@ -58,7 +60,7 @@ internal fun BookingBarItem(
         if (bar.isOnHold) R.string.timeline_booking_on_hold_description else R.string.timeline_booking_description,
         bar.guestName,
         bar.houseName,
-        TimelineFormat.stayRange(bar.checkIn, bar.checkOut, currentLocale()),
+        DateFormats.stayRange(bar.checkIn, bar.checkOut, currentLocale()),
     )
     val surface = if (bar.isOnHold) {
         Modifier
@@ -124,7 +126,7 @@ internal fun ResortBlockItem(
     val description = stringResource(
         if (block.isOnHold) R.string.timeline_resort_hold_description else R.string.timeline_resort_description,
         block.guestName,
-        TimelineFormat.stayRange(block.checkIn, block.checkOut, currentLocale()),
+        DateFormats.stayRange(block.checkIn, block.checkOut, currentLocale()),
     )
     val surface = if (block.isOnHold) {
         Modifier

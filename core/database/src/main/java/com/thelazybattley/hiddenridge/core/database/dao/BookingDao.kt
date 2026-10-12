@@ -26,6 +26,17 @@ interface BookingDao {
     )
     fun observeActiveBetween(from: LocalDate, to: LocalDate): Flow<List<BookingWithHouses>>
 
+    @Transaction
+    @Query("SELECT * FROM bookings WHERE id = :id")
+    fun observeById(id: String): Flow<BookingWithHouses?>
+
+    @Query("UPDATE bookings SET status = :status, hold_until = :holdUntil WHERE id = :id")
+    suspend fun updateStatus(id: String, status: String, holdUntil: LocalDate?)
+
+    /** Also removes the booking's house links, through the foreign key cascade. */
+    @Query("DELETE FROM bookings WHERE id = :id")
+    suspend fun deleteById(id: String)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertBookings(bookings: List<BookingEntity>)
 

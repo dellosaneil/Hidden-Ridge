@@ -32,13 +32,14 @@ fun HiddenRidgeApp(modifier: Modifier = Modifier) {
     val currentDestination = navController.currentBackStackEntryAsState().value?.destination
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    val notBuiltYetMessage = stringResource(R.string.not_built_yet)
-    val showNotBuiltYet: () -> Unit = {
+    val showMessage: (String) -> Unit = { message ->
         scope.launch {
             snackbarHostState.currentSnackbarData?.dismiss()
-            snackbarHostState.showSnackbar(notBuiltYetMessage)
+            snackbarHostState.showSnackbar(message)
         }
     }
+    val notBuiltYetMessage = stringResource(R.string.not_built_yet)
+    val showNotBuiltYet: () -> Unit = { showMessage(notBuiltYetMessage) }
 
     Scaffold(
         modifier = modifier,
@@ -75,6 +76,7 @@ fun HiddenRidgeApp(modifier: Modifier = Modifier) {
     ) { innerPadding ->
         HiddenRidgeNavHost(
             navController = navController,
+            onShowMessage = showMessage,
             onNotBuiltYet = showNotBuiltYet,
             modifier = Modifier
                 .padding(innerPadding)

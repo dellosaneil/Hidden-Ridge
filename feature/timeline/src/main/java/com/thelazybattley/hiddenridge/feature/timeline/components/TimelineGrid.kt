@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import com.thelazybattley.hiddenridge.core.designsystem.format.currentLocale
 import com.thelazybattley.hiddenridge.core.designsystem.theme.ExtendedColors
 import com.thelazybattley.hiddenridge.core.designsystem.theme.HiddenRidgeTheme
 import com.thelazybattley.hiddenridge.feature.timeline.R

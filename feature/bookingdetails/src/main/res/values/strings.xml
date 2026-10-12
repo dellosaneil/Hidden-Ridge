@@ -1,0 +1,64 @@
+<resources>
+    <string name="booking_kind_individual">Individual</string>
+    <string name="booking_kind_group">Group · several houses</string>
+    <string name="booking_kind_whole_resort">Whole resort</string>
+
+    <string name="booking_status_confirmed">Confirmed</string>
+    <string name="booking_status_hold">Hold, not confirmed</string>
+    <string name="booking_status_hold_until">Hold until %1$s</string>
+
+    <string name="stay_departed">Departed</string>
+    <string name="stay_leaves_today">Checks out today</string>
+    <string name="stay_arrives_today">Arrives today</string>
+    <string name="stay_arrives_tomorrow">Arrives tomorrow</string>
+    <string name="stay_in_house">In-house · night %1$d of %2$d</string>
+    <plurals name="stay_arrives_in_days">
+        <item quantity="one">Arrives in %1$d day</item>
+        <item quantity="other">Arrives in %1$d days</item>
+    </plurals>
+    <plurals name="stay_arrives_in_months">
+        <item quantity="one">Arrives in about %1$d month</item>
+        <item quantity="other">Arrives in about %1$d months</item>
+    </plurals>
+
+    <string name="fact_dates">Dates</string>
+    <string name="fact_dates_value">%1$s → %2$s</string>
+    <plurals name="fact_nights">
+        <item quantity="one">%1$d night</item>
+        <item quantity="other">%1$d nights</item>
+    </plurals>
+    <string name="fact_house">House</string>
+    <string name="fact_houses">Houses</string>
+    <string name="fact_house_value">%1$s · sleeps %2$d</string>
+    <plurals name="fact_whole_resort_value">
+        <item quantity="one">Whole resort · %1$d house</item>
+        <item quantity="other">Whole resort · all %1$d houses</item>
+    </plurals>
+    <string name="fact_sleeps_total">Sleeps %1$d in total</string>
+    <string name="fact_guests">Guests</string>
+    <plurals name="fact_guests_value">
+        <item quantity="one">%1$d guest</item>
+        <item quantity="other">%1$d guests</item>
+    </plurals>
+    <string name="fact_phone">Phone</string>
+    <string name="fact_phone_call">Call</string>
+    <string name="fact_note">Note</string>
+
+    <string name="action_reschedule">Reschedule</string>
+    <string name="action_move">Move</string>
+    <string name="action_edit_details">Edit details</string>
+    <string name="action_put_on_hold">Put on hold</string>
+    <string name="action_confirm_booking">Confirm booking</string>
+    <string name="action_cancel_booking">Cancel booking</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_keep_booking">Keep booking</string>
+
+    <string name="every_house">Every house</string>
+    <string name="cancel_confirmation">Cancel %1$s? %2$s becomes free for %3$s. The booking stays in history as cancelled.</string>
+    <string name="delete_title">Delete %1$s’s booking?</string>
+    <string name="delete_message">This removes the booking from the timeline and from booking history. %1$s becomes free for %2$s.</string>
+    <string name="delete_hint">Use %1$s instead if the guest cancelled. That keeps a record for reports.</string>
+
+    <string name="message_cancelled">Cancelled %1$s. Kept in history.</string>
+    <string name="message_deleted">Deleted %1$s</string>
+</resources>
