@@ -1,0 +1,51 @@
+package com.thelazybattley.hiddenridge.core.database.dao
+
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
+import com.thelazybattley.hiddenridge.core.database.entity.BookingEntity
+import com.thelazybattley.hiddenridge.core.database.entity.BookingHouseCrossRef
+import com.thelazybattley.hiddenridge.core.database.entity.BookingWithHouses
+import java.time.LocalDate
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface BookingDao {
+    /** Bookings that are not cancelled and have at least one night between [from] and [to] (exclusive). */
+    @Transaction
+    @Query(
+        """
+        SELECT * FROM bookings
+        WHERE status != '${BookingEntity.STATUS_CANCELLED}'
+          AND check_in < :to
+          AND check_out > :from
+        ORDER BY check_in
+        """,
+    )
+    fun observeActiveBetween(from: LocalDate, to: LocalDate): Flow<List<BookingWithHouses>>
+
+    @Transaction
+    @Query("SELECT * FROM bookings WHERE id = :id")
+    fun observeById(id: String): Flow<BookingWithHouses?>
+
+    @Query("UPDATE bookings SET status = :status, hold_until = :holdUntil WHERE id = :id")
+    suspend fun updateStatus(id: String, status: String, holdUntil: LocalDate?)
+
+    /** Also removes the booking's house links, through the foreign key cascade. */
+    @Query("DELETE FROM bookings WHERE id = :id")
+    suspend fun deleteById(id: String)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertBookings(bookings: List<BookingEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertBookingHouses(bookingHouses: List<BookingHouseCrossRef>)
+
+    @Transaction
+    suspend fun upsertAll(bookings: List<BookingEntity>, bookingHouses: List<BookingHouseCrossRef>) {
+        upsertBookings(bookings)
+        upsertBookingHouses(bookingHouses)
+    }
+}

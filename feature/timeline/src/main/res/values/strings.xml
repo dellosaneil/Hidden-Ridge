@@ -1,0 +1,35 @@
+<resources>
+    <plurals name="timeline_property_label">
+        <item quantity="one">Hidden Ridge · %1$d house</item>
+        <item quantity="other">Hidden Ridge · %1$d houses</item>
+    </plurals>
+    <string name="timeline_change_month">Go to another month</string>
+    <string name="timeline_check_availability">Check availability</string>
+    <string name="timeline_new_booking">New</string>
+    <string name="timeline_today">Today</string>
+    <string name="timeline_go_to_today">Go to today, %1$s</string>
+    <string name="timeline_house_column">House</string>
+
+    <string name="timeline_group_cabins">Cabins</string>
+    <string name="timeline_group_casitas">Casitas</string>
+    <string name="timeline_group_family_houses">Family houses</string>
+
+    <string name="timeline_legend_free">Free</string>
+    <string name="timeline_legend_booked">Booked</string>
+    <string name="timeline_legend_hold">Hold</string>
+    <string name="timeline_legend_whole_resort">Whole resort</string>
+    <string name="timeline_legend_resort_hold">Resort hold</string>
+    <string name="timeline_legend_now">Now</string>
+
+    <string name="timeline_nights_short">%1$dn</string>
+    <string name="timeline_booking_description">%1$s, %2$s, %3$s</string>
+    <string name="timeline_booking_on_hold_description">%1$s, %2$s, %3$s, on hold</string>
+
+    <string name="timeline_whole_resort_label">Whole resort · %1$s</string>
+    <string name="timeline_resort_hold_label">Resort hold · %1$s</string>
+    <string name="timeline_status_confirmed">Confirmed</string>
+    <string name="timeline_status_hold">Hold</string>
+    <string name="timeline_status_hold_until">Hold until %1$s</string>
+    <string name="timeline_resort_description">%1$s, whole resort, %2$s, confirmed</string>
+    <string name="timeline_resort_hold_description">%1$s, whole resort, %2$s, on hold, not confirmed</string>
+</resources>

@@ -1,0 +1,70 @@
+<resources>
+    <string name="availability_title">Check availability</string>
+    <string name="action_close">Close availability</string>
+    <string name="action_clear">Clear</string>
+
+    <string name="filters_label">What to check</string>
+    <string name="filter_any_house">Any house</string>
+    <string name="filter_cabins">Cabins</string>
+    <string name="filter_casitas">Casitas</string>
+    <string name="filter_family">Family</string>
+    <string name="filter_whole_resort">Whole resort</string>
+
+    <string name="field_check_in">Check-in</string>
+    <string name="field_check_out">Check-out</string>
+    <string name="field_tap_a_date">Tap a date</string>
+    <plurals name="nights">
+        <item quantity="one">%1$d night</item>
+        <item quantity="other">%1$d nights</item>
+    </plurals>
+
+    <string name="calendar_previous_month">Previous month</string>
+    <string name="calendar_next_month">Next month</string>
+    <string name="legend_all_free">All free</string>
+    <string name="legend_some_free">Some free</string>
+    <string name="legend_full">Full</string>
+    <string name="legend_resort_booked">Resort booked</string>
+    <string name="legend_resort_hold">Resort hold</string>
+    <string name="calendar_note_houses">Numbers show free houses each night.</string>
+    <string name="calendar_note_type">Numbers show free %1$s each night.</string>
+    <string name="type_cabins">cabins</string>
+    <string name="type_casitas">casitas</string>
+    <string name="type_family_houses">family houses</string>
+    <string name="day_free">Free</string>
+    <string name="day_busy">Busy</string>
+    <string name="day_free_count">%1$d/%2$d</string>
+    <string name="day_description_count">%1$s: %2$d of %3$d free</string>
+    <string name="day_description_resort_free">%1$s: every house free</string>
+    <string name="day_description_resort_busy">%1$s: some houses taken</string>
+    <string name="day_description_resort_booked">%1$s: whole resort booked by %2$s</string>
+    <string name="day_description_resort_hold">%1$s: whole resort on hold for %2$s</string>
+
+    <string name="prompt_pick_check_in">Tap a check-in date to see what\'s free.</string>
+    <string name="prompt_pick_check_out">Now tap the check-out date, or pick a length of stay.</string>
+
+    <string name="result_houses_free">%1$d of %2$d %3$s free</string>
+    <string name="result_houses">houses</string>
+    <string name="result_nothing_free">Nothing free</string>
+    <string name="result_resort_free">Whole resort is free</string>
+    <string name="result_resort_taken">Whole resort isn\'t free</string>
+    <string name="result_range">%1$s · %2$s</string>
+    <string name="next_opening">Next opening for %1$s</string>
+
+    <string name="house_sleeps">· sleeps %1$d</string>
+    <string name="house_free_all_nights">Free all nights</string>
+    <string name="house_taken_by">%1$s · %2$s</string>
+    <string name="house_taken_by_hold">%1$s (hold) · %2$s</string>
+    <string name="house_taken_by_resort">Whole resort · %1$s</string>
+    <string name="action_book">Book</string>
+    <string name="action_view">View</string>
+    <string name="action_book_house">Book %1$s</string>
+    <string name="action_view_booking">View %1$s</string>
+    <string name="action_book_all">Book all %1$d free · sleeps %2$d</string>
+    <string name="action_book_whole_resort">Book whole resort</string>
+    <string name="conflict_hold">%1$s · hold</string>
+    <string name="conflict_detail">%1$s · %2$s</string>
+    <plurals name="whole_resort_houses">
+        <item quantity="one">Whole resort · %1$d house</item>
+        <item quantity="other">Whole resort · all %1$d houses</item>
+    </plurals>
+</resources>
