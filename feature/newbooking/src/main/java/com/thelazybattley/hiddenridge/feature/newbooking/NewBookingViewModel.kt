@@ -30,7 +30,12 @@ class NewBookingViewModel @Inject constructor(
 
     private val form = MutableStateFlow(
         savedStateHandle.toRoute<NewBookingRoute>().let { route ->
-            NewBookingForm.startingWith(houseId = route.houseId, checkIn = route.checkInEpochDay?.let(LocalDate::ofEpochDay))
+            NewBookingForm.startingWith(
+                houseIds = route.houseIds,
+                wholeResort = route.wholeResort,
+                checkIn = route.checkInEpochDay?.let(LocalDate::ofEpochDay),
+                checkOut = route.checkOutEpochDay?.let(LocalDate::ofEpochDay),
+            )
         },
     )
     private val created = MutableStateFlow<Booking?>(null)

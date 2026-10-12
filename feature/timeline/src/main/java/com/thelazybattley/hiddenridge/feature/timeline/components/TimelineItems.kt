@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.thelazybattley.hiddenridge.core.designsystem.component.dashedBorder
+import com.thelazybattley.hiddenridge.core.designsystem.component.rememberResortHatchBrush
+import com.thelazybattley.hiddenridge.core.designsystem.component.rememberResortHoldHatchBrush
 import com.thelazybattley.hiddenridge.core.designsystem.format.DateFormats
 import com.thelazybattley.hiddenridge.core.designsystem.format.currentLocale
 import com.thelazybattley.hiddenridge.feature.timeline.BookingBar

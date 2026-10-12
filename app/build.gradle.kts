@@ -43,6 +43,7 @@ dependencies {
     implementation(projects.feature.timeline)
     implementation(projects.feature.bookingdetails)
     implementation(projects.feature.newbooking)
+    implementation(projects.feature.availability)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)

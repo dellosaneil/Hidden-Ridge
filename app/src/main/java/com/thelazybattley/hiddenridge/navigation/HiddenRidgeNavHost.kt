@@ -4,6 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.thelazybattley.hiddenridge.feature.availability.navigation.availabilitySheet
+import com.thelazybattley.hiddenridge.feature.availability.navigation.closeAvailability
+import com.thelazybattley.hiddenridge.feature.availability.navigation.navigateToAvailability
 import com.thelazybattley.hiddenridge.feature.bookingdetails.navigation.bookingDetailsSheet
 import com.thelazybattley.hiddenridge.feature.bookingdetails.navigation.closeBookingDetails
 import com.thelazybattley.hiddenridge.feature.bookingdetails.navigation.navigateToBookingDetails
@@ -16,7 +19,7 @@ import com.thelazybattley.hiddenridge.feature.timeline.navigation.timelineScreen
 /**
  * @param onShowMessage shows a short confirmation, such as after a booking is cancelled.
  * @param onNotBuiltYet called for destinations whose screens don't exist yet
- *   (reschedule, move, edit, availability, month picker).
+ *   (reschedule, move, edit, month picker).
  */
 @Composable
 fun HiddenRidgeNavHost(
@@ -36,9 +39,9 @@ fun HiddenRidgeNavHost(
     ) {
         timelineScreen(
             onBookingClick = navController::navigateToBookingDetails,
-            onEmptyDayClick = { houseId, date -> navController.navigateToNewBooking(houseId = houseId, checkIn = date) },
+            onEmptyDayClick = { houseId, date -> navController.navigateToNewBooking(houseIds = listOf(houseId), checkIn = date) },
             onNewBookingClick = { navController.navigateToNewBooking() },
-            onCheckAvailabilityClick = onNotBuiltYet,
+            onCheckAvailabilityClick = { navController.navigateToAvailability() },
             onMonthTitleClick = onNotBuiltYet,
         )
         bookingDetailsSheet(
@@ -51,6 +54,15 @@ fun HiddenRidgeNavHost(
         newBookingSheet(
             onDismiss = navController::closeNewBooking,
             onShowMessage = onShowMessage,
+        )
+        availabilitySheet(
+            onDismiss = navController::closeAvailability,
+            onBook = { houseIds, wholeResort, checkIn, checkOut ->
+                navController.closeAvailability()
+                navController.navigateToNewBooking(houseIds = houseIds, wholeResort = wholeResort, checkIn = checkIn, checkOut = checkOut)
+            },
+            // Opens on top, so closing the booking returns to the same check.
+            onViewBooking = navController::navigateToBookingDetails,
         )
     }
 }

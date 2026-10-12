@@ -8,15 +8,31 @@ import com.thelazybattley.hiddenridge.feature.newbooking.NewBookingSheet
 import java.time.LocalDate
 import kotlinx.serialization.Serializable
 
-/** Both arguments are optional: tapping an empty night on the timeline prefills them. */
+/**
+ * Everything is optional: the form can open empty, or prefilled from a tapped night on the
+ * timeline or a stay found free in Check availability.
+ */
 @Serializable
 data class NewBookingRoute(
-    val houseId: String? = null,
+    val houseIds: List<String> = emptyList(),
+    val wholeResort: Boolean = false,
     val checkInEpochDay: Long? = null,
+    val checkOutEpochDay: Long? = null,
 )
 
-fun NavController.navigateToNewBooking(houseId: String? = null, checkIn: LocalDate? = null) {
-    navigate(NewBookingRoute(houseId = houseId, checkInEpochDay = checkIn?.toEpochDay())) { launchSingleTop = true }
+fun NavController.navigateToNewBooking(
+    houseIds: List<String> = emptyList(),
+    wholeResort: Boolean = false,
+    checkIn: LocalDate? = null,
+    checkOut: LocalDate? = null,
+) {
+    val route = NewBookingRoute(
+        houseIds = houseIds,
+        wholeResort = wholeResort,
+        checkInEpochDay = checkIn?.toEpochDay(),
+        checkOutEpochDay = checkOut?.toEpochDay(),
+    )
+    navigate(route) { launchSingleTop = true }
 }
 
 /** Closes the form; safe to call when it is already gone. */

@@ -23,12 +23,18 @@ internal data class NewBookingForm(
     val isSaving: Boolean = false,
 ) {
     companion object {
-        /** Prefilled from the timeline: a tapped house row and night, one night long. */
-        fun startingWith(houseId: String?, checkIn: LocalDate?) = NewBookingForm(
+        /** Prefilled from where the form was opened; a check-in on its own books one night. */
+        fun startingWith(
+            houseIds: List<String>,
+            wholeResort: Boolean,
+            checkIn: LocalDate?,
+            checkOut: LocalDate?,
+        ) = NewBookingForm(
             draft = BookingDraft(
-                houseIds = listOfNotNull(houseId),
+                mode = if (wholeResort) BookingMode.WHOLE_RESORT else BookingMode.INDIVIDUAL,
+                houseIds = houseIds,
                 checkIn = checkIn,
-                checkOut = checkIn?.plusDays(1),
+                checkOut = checkOut ?: checkIn?.plusDays(1),
             ),
         )
     }

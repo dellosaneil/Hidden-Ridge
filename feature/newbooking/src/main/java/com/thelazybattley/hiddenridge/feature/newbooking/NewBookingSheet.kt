@@ -4,15 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.union
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -34,15 +29,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.thelazybattley.hiddenridge.core.designsystem.component.DestinationBottomSheet
+import com.thelazybattley.hiddenridge.core.designsystem.component.TallDestinationBottomSheet
 import com.thelazybattley.hiddenridge.core.designsystem.format.DateFormats
 import com.thelazybattley.hiddenridge.core.designsystem.format.currentLocale
 import com.thelazybattley.hiddenridge.core.domain.model.BookingMode
@@ -54,11 +47,6 @@ import com.thelazybattley.hiddenridge.feature.newbooking.components.HousesSectio
 import com.thelazybattley.hiddenridge.feature.newbooking.components.SegmentOption
 import com.thelazybattley.hiddenridge.feature.newbooking.components.SegmentedChoice
 import kotlinx.coroutines.launch
-
-private const val SHEET_HEIGHT_FRACTION = 0.94f
-
-/** Material 3's default sheet drag handle: a 4dp bar with 22dp above and below. */
-private val SheetDragHandleHeight = 48.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,36 +74,18 @@ internal fun NewBookingSheet(
         }
     }
 
-    // Most of the screen, leaving the timeline peeking above as a reminder of where this returns to.
-    // Sized from the window, not the sheet's incoming constraints: those change while the sheet is
-    // dragged, and a height that follows them moves the sheet's anchors and makes it shake.
-    // The sheet adds no inset padding of its own, so this height is the whole sheet below the handle.
-    val windowHeight = LocalWindowInfo.current.containerSize.height
-    val formHeight = with(LocalDensity.current) { (windowHeight * SHEET_HEIGHT_FRACTION).toDp() } - SheetDragHandleHeight
+    TallDestinationBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
+        when (val state = uiState) {
+            NewBookingUiState.Loading, is NewBookingUiState.Created -> Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
+            ) { CircularProgressIndicator() }
 
-    DestinationBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        contentWindowInsets = { WindowInsets(0) },
-    ) {
-        Column(
-            modifier = Modifier
-                .height(formHeight)
-                // Keeps the footer above the navigation bar, and above the keyboard while typing.
-                .windowInsetsPadding(WindowInsets.ime.union(WindowInsets.navigationBars)),
-        ) {
-            when (val state = uiState) {
-                NewBookingUiState.Loading, is NewBookingUiState.Created -> Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) { CircularProgressIndicator() }
-
-                is NewBookingUiState.Editing -> NewBookingContent(
-                    form = state.form,
-                    onAction = viewModel::onAction,
-                    onClose = hideThenDismiss,
-                )
-            }
+            is NewBookingUiState.Editing -> NewBookingContent(
+                form = state.form,
+                onAction = viewModel::onAction,
+                onClose = hideThenDismiss,
+            )
         }
     }
 }
