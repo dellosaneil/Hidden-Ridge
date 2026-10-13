@@ -32,4 +32,24 @@
     <string name="timeline_status_hold_until">Hold until %1$s</string>
     <string name="timeline_resort_description">%1$s, whole resort, %2$s, confirmed</string>
     <string name="timeline_resort_hold_description">%1$s, whole resort, %2$s, on hold, not confirmed</string>
+
+    <string name="timeline_pick_up_to_move">Pick up to move</string>
+    <string name="timeline_booking_moving_description">%1$s, %2$s, %3$s, being moved</string>
+    <string name="timeline_resort_moving_description">%1$s, whole resort, %2$s, being moved</string>
+
+    <string name="timeline_move_hint">Moving %1$s. Drag the bar or use the arrows.</string>
+    <string name="timeline_move_target">%1$s · %2$s</string>
+    <string name="timeline_move_whole_resort">Whole resort</string>
+    <string name="timeline_move_overlaps">Overlaps %1$s · %2$s · %3$s</string>
+    <string name="timeline_move_overlaps_whole_resort">whole resort</string>
+    <string name="timeline_move_ready">No conflicts. Ready to save.</string>
+    <string name="timeline_move_not_moved">Not moved yet.</string>
+    <string name="timeline_move_earlier">One day earlier</string>
+    <string name="timeline_move_later">One day later</string>
+    <string name="timeline_move_house_above">House above</string>
+    <string name="timeline_move_house_below">House below</string>
+    <string name="timeline_move_cancel">Cancel</string>
+    <string name="timeline_move_save">Save</string>
+    <string name="timeline_moved">%1$s moved to %2$s · %3$s</string>
+    <string name="timeline_moved_resort">%1$s moved to %2$s</string>
 </resources>

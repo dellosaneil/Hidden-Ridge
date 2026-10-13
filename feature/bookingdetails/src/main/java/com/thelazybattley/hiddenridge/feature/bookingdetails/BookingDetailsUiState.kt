@@ -56,6 +56,8 @@ internal data class BookingDetailsUi(
     val guestCount: Int,
     val phone: String,
     val note: String,
+    /** Whether the stay can still be moved; false once it has checked out. */
+    val canMove: Boolean,
 ) {
     val isOnHold: Boolean get() = status is BookingStatusUi.OnHold
 }

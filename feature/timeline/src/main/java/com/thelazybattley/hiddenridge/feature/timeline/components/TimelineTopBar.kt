@@ -46,6 +46,8 @@ internal fun TimelineTopBar(
     onCheckAvailabilityClick: () -> Unit,
     onNewBookingClick: () -> Unit,
     modifier: Modifier = Modifier,
+    /** Off while a booking is being moved, so a new one can't be started over it. */
+    isNewBookingEnabled: Boolean = true,
 ) {
     val locale = currentLocale()
     val monthTitle = remember(visibleMonth, locale) { TimelineFormat.monthYear(locale).format(visibleMonth) }
@@ -71,6 +73,7 @@ internal fun TimelineTopBar(
         Spacer(Modifier.width(4.dp))
         Button(
             onClick = onNewBookingClick,
+            enabled = isNewBookingEnabled,
             contentPadding = PaddingValues(start = 12.dp, end = 16.dp),
             modifier = Modifier.height(40.dp),
         ) {

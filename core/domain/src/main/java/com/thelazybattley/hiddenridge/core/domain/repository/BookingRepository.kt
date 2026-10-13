@@ -17,5 +17,8 @@ interface BookingRepository {
 
     suspend fun updateStatus(bookingId: String, status: BookingStatus, holdUntil: LocalDate?)
 
+    /** Saves every field of an existing booking, including the houses it occupies. */
+    suspend fun updateBooking(booking: Booking)
+
     suspend fun deleteBooking(bookingId: String)
 }
