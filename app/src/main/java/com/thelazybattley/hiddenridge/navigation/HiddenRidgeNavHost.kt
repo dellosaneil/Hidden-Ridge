@@ -14,18 +14,22 @@ import com.thelazybattley.hiddenridge.feature.newbooking.navigation.closeNewBook
 import com.thelazybattley.hiddenridge.feature.newbooking.navigation.navigateToNewBooking
 import com.thelazybattley.hiddenridge.feature.newbooking.navigation.newBookingSheet
 import com.thelazybattley.hiddenridge.feature.timeline.navigation.TimelineRoute
+import com.thelazybattley.hiddenridge.feature.timeline.navigation.moveBookingOnTimeline
 import com.thelazybattley.hiddenridge.feature.timeline.navigation.timelineScreen
 
 /**
  * @param onShowMessage shows a short confirmation, such as after a booking is cancelled.
  * @param onNotBuiltYet called for destinations whose screens don't exist yet
- *   (reschedule, move, edit, month picker).
+ *   (reschedule, edit, month picker).
+ * @param onMovingChange true while a booking is picked up on the timeline, when the move bar
+ *   takes the navigation bar's place.
  */
 @Composable
 fun HiddenRidgeNavHost(
     navController: NavHostController,
     onShowMessage: (String) -> Unit,
     onNotBuiltYet: () -> Unit,
+    onMovingChange: (isMoving: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val leaveBookingDetailsFor: (String) -> Unit = {
@@ -43,11 +47,14 @@ fun HiddenRidgeNavHost(
             onNewBookingClick = { navController.navigateToNewBooking() },
             onCheckAvailabilityClick = { navController.navigateToAvailability() },
             onMonthTitleClick = onNotBuiltYet,
+            onMovingChange = onMovingChange,
+            onShowMessage = onShowMessage,
         )
         bookingDetailsSheet(
             onDismiss = navController::closeBookingDetails,
             onReschedule = leaveBookingDetailsFor,
-            onMove = leaveBookingDetailsFor,
+            // The booking is picked up on the timeline, where it can be dragged.
+            onMove = navController::moveBookingOnTimeline,
             onEditDetails = leaveBookingDetailsFor,
             onShowMessage = onShowMessage,
         )

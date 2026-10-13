@@ -2,6 +2,7 @@ package com.thelazybattley.hiddenridge.feature.bookingdetails
 
 import com.thelazybattley.hiddenridge.core.domain.model.BookingDetails
 import com.thelazybattley.hiddenridge.core.domain.model.House
+import com.thelazybattley.hiddenridge.core.domain.model.canMoveOn
 
 internal fun BookingDetails.toUi(): BookingDetailsUi = BookingDetailsUi(
     guestName = booking.guestName,
@@ -23,4 +24,5 @@ internal fun BookingDetails.toUi(): BookingDetailsUi = BookingDetailsUi(
     guestCount = booking.guestCount,
     phone = booking.phone,
     note = booking.note,
+    canMove = booking.canMoveOn(today),
 )

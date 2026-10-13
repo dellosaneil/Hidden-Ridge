@@ -33,6 +33,10 @@ internal class OfflineBookingRepository @Inject constructor(
         bookingDao.updateStatus(id = bookingId, status = status.name, holdUntil = holdUntil)
     }
 
+    override suspend fun updateBooking(booking: Booking) {
+        bookingDao.updateWithHouses(booking = booking.toEntity(), bookingHouses = booking.toHouseRefs())
+    }
+
     override suspend fun deleteBooking(bookingId: String) {
         bookingDao.deleteById(bookingId)
     }

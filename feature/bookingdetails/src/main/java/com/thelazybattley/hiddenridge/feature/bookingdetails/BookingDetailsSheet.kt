@@ -131,6 +131,7 @@ private fun BookingDetailsBody(
         } else {
             BookingActions(
                 isOnHold = details.isOnHold,
+                canMove = details.canMove,
                 onAction = onAction,
                 modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 16.dp),
             )
@@ -164,6 +165,7 @@ private fun BookingDetailsPreview() {
                         guestCount = 2,
                         phone = "(555) 318-2207",
                         note = "Anniversary. Asked for a late check-out.",
+                        canMove = true,
                     ),
                     confirmation = null,
                 ),

@@ -45,10 +45,13 @@ private val ActionPadding = PaddingValues(horizontal = 12.dp)
 /**
  * Three tiers, by consequence: the main changes (filled, tonal), smaller edits (outlined),
  * then the destructive pair set apart below a divider in the error color.
+ *
+ * @param canMove false hides Move, for stays that have already checked out.
  */
 @Composable
 internal fun BookingActions(
     isOnHold: Boolean,
+    canMove: Boolean,
     onAction: (BookingDetailsAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -60,11 +63,13 @@ internal fun BookingActions(
                 contentPadding = ActionPadding,
                 modifier = actionModifier(),
             ) { ActionLabel(Icons.Outlined.EventRepeat, R.string.action_reschedule) }
-            FilledTonalButton(
-                onClick = { onAction(BookingDetailsAction.Move) },
-                contentPadding = ActionPadding,
-                modifier = actionModifier(),
-            ) { ActionLabel(Icons.Outlined.OpenWith, R.string.action_move) }
+            if (canMove) {
+                FilledTonalButton(
+                    onClick = { onAction(BookingDetailsAction.Move) },
+                    contentPadding = ActionPadding,
+                    modifier = actionModifier(),
+                ) { ActionLabel(Icons.Outlined.OpenWith, R.string.action_move) }
+            }
         }
         ActionRow {
             OutlinedButton(
