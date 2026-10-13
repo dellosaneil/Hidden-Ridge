@@ -33,7 +33,6 @@ fun NavGraphBuilder.timelineScreen(
     onEmptyDayClick: (houseId: String, date: LocalDate) -> Unit,
     onNewBookingClick: () -> Unit,
     onCheckAvailabilityClick: () -> Unit,
-    onMonthTitleClick: () -> Unit,
     onMovingChange: (isMoving: Boolean) -> Unit,
     onShowMessage: (message: String) -> Unit,
 ) {
@@ -47,7 +46,6 @@ fun NavGraphBuilder.timelineScreen(
             onEmptyDayClick = onEmptyDayClick,
             onNewBookingClick = onNewBookingClick,
             onCheckAvailabilityClick = onCheckAvailabilityClick,
-            onMonthTitleClick = onMonthTitleClick,
             onMovingChange = onMovingChange,
             onShowMessage = onShowMessage,
         )

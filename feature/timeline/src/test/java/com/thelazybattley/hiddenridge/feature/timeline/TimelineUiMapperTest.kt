@@ -77,6 +77,26 @@ class TimelineUiMapperTest {
     }
 
     @Test
+    fun `each month counts the house-nights booked inside it`() {
+        // Two of three houses for the last 2 nights of October, then 1 night in November.
+        val stay = booking(houseIds = listOf("c1", "c2"), checkIn = LocalDate.of(2026, 10, 30), checkOut = LocalDate.of(2026, 11, 2))
+        val wedding = booking(
+            houseIds = emptyList(),
+            checkIn = LocalDate.of(2026, 12, 18),
+            checkOut = LocalDate.of(2026, 12, 21),
+            mode = BookingMode.WHOLE_RESORT,
+        ).copy(id = "w1")
+
+        val months = timeline(bookings = listOf(stay, wedding)).toUi().months.associateBy { it.yearMonth }
+
+        assertEquals(4f / (3 * 31), months.getValue(YearMonth.of(2026, 10)).bookedFraction, 0.0001f)
+        assertEquals(2f / (3 * 30), months.getValue(YearMonth.of(2026, 11)).bookedFraction, 0.0001f)
+        assertEquals(9f / (3 * 31), months.getValue(YearMonth.of(2026, 12)).bookedFraction, 0.0001f)
+        assertTrue(months.getValue(YearMonth.of(2026, 12)).hasWholeResort)
+        assertFalse(months.getValue(YearMonth.of(2026, 11)).hasWholeResort)
+    }
+
+    @Test
     fun `a picked-up booking that hasn't moved is lifted with no ghost and nothing to save`() {
         val stay = booking(houseIds = listOf("c1"), checkIn = today.plusDays(2), checkOut = today.plusDays(4))
         val timeline = timeline(bookings = listOf(stay))

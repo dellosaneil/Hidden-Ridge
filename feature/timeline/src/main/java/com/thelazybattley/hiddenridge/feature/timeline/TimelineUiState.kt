@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.thelazybattley.hiddenridge.core.domain.model.HouseType
 import java.time.LocalDate
 import java.time.YearMonth
+import kotlin.math.roundToInt
 
 internal sealed interface TimelineUiState {
     data object Loading : TimelineUiState
@@ -112,7 +113,13 @@ internal data class TimelineMonth(
     val yearMonth: YearMonth,
     val startIndex: Int,
     val dayCount: Int,
-)
+    /** Share of house-nights booked, 0 to 1; a whole-resort stay books every house. */
+    val bookedFraction: Float = 0f,
+    /** A whole-resort booking has at least one night this month. */
+    val hasWholeResort: Boolean = false,
+) {
+    val bookedPercent: Int get() = (bookedFraction * 100).roundToInt()
+}
 
 @Immutable
 internal sealed interface TimelineRow {

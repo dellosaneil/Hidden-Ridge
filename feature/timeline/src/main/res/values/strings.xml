@@ -52,4 +52,12 @@
     <string name="timeline_move_save">Save</string>
     <string name="timeline_moved">%1$s moved to %2$s · %3$s</string>
     <string name="timeline_moved_resort">%1$s moved to %2$s</string>
+
+    <string name="timeline_go_to_month_title">Go to month</string>
+    <string name="timeline_go_to_month_hint">Bars show how full each month is. A lock marks a whole-resort block.</string>
+    <string name="timeline_year">Year</string>
+    <string name="timeline_month_booked">%1$d%% booked</string>
+    <string name="timeline_month_description">%1$s, %2$d%% booked</string>
+    <string name="timeline_month_description_resort">%1$s, %2$d%% booked, has a whole-resort block</string>
+    <string name="timeline_dialog_cancel">Cancel</string>
 </resources>

@@ -16,9 +16,12 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -29,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.thelazybattley.hiddenridge.core.designsystem.format.DateFormats
 import com.thelazybattley.hiddenridge.core.designsystem.format.currentLocale
 import com.thelazybattley.hiddenridge.core.designsystem.theme.HiddenRidgeTheme
+import com.thelazybattley.hiddenridge.feature.timeline.components.GoToMonthDialog
 import com.thelazybattley.hiddenridge.feature.timeline.components.MonthRail
 import com.thelazybattley.hiddenridge.feature.timeline.components.MoveBar
 import com.thelazybattley.hiddenridge.feature.timeline.components.TimelineDimens
@@ -58,7 +62,6 @@ internal fun TimelineScreen(
     onEmptyDayClick: (houseId: String, date: LocalDate) -> Unit,
     onNewBookingClick: () -> Unit,
     onCheckAvailabilityClick: () -> Unit,
-    onMonthTitleClick: () -> Unit,
     onMovingChange: (isMoving: Boolean) -> Unit,
     onShowMessage: (message: String) -> Unit,
     modifier: Modifier = Modifier,
@@ -103,7 +106,6 @@ internal fun TimelineScreen(
             viewModel.onAction(TimelineAction.CancelMove)
             onCheckAvailabilityClick()
         },
-        onMonthTitleClick = onMonthTitleClick,
         onAction = viewModel::onAction,
         modifier = modifier,
     )
@@ -116,7 +118,6 @@ internal fun TimelineScreenContent(
     onEmptyDayClick: (houseId: String, date: LocalDate) -> Unit,
     onNewBookingClick: () -> Unit,
     onCheckAvailabilityClick: () -> Unit,
-    onMonthTitleClick: () -> Unit,
     onAction: (TimelineAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -134,7 +135,6 @@ internal fun TimelineScreenContent(
                 onEmptyDayClick = onEmptyDayClick,
                 onNewBookingClick = onNewBookingClick,
                 onCheckAvailabilityClick = onCheckAvailabilityClick,
-                onMonthTitleClick = onMonthTitleClick,
                 onAction = onAction,
             )
         }
@@ -149,7 +149,6 @@ private fun TimelineReady(
     onEmptyDayClick: (houseId: String, date: LocalDate) -> Unit,
     onNewBookingClick: () -> Unit,
     onCheckAvailabilityClick: () -> Unit,
-    onMonthTitleClick: () -> Unit,
     onAction: (TimelineAction) -> Unit,
 ) {
     val density = LocalDensity.current
@@ -184,11 +183,27 @@ private fun TimelineReady(
     val activeMonthIndex by remember(timeline, dayPx) {
         derivedStateOf { timeline.monthIndexAt(firstVisibleDay(horizontalScroll, dayPx) + ACTIVE_MONTH_PROBE_DAYS) }
     }
+    var isGoToMonthOpen by rememberSaveable { mutableStateOf(false) }
+    if (isGoToMonthOpen) {
+        GoToMonthDialog(
+            months = timeline.months,
+            visibleMonth = timeline.months[activeMonthIndex].yearMonth,
+            onMonthClick = { index ->
+                isGoToMonthOpen = false
+                scrollToDay(timeline.months[index].startIndex)
+            },
+            onTodayClick = {
+                isGoToMonthOpen = false
+                scrollToToday()
+            },
+            onDismiss = { isGoToMonthOpen = false },
+        )
+    }
     Column(Modifier.fillMaxSize()) {
         TimelineTopBar(
             houseCount = timeline.houseCount,
             visibleMonth = timeline.months[activeMonthIndex].yearMonth,
-            onMonthTitleClick = onMonthTitleClick,
+            onMonthTitleClick = { isGoToMonthOpen = true },
             onCheckAvailabilityClick = onCheckAvailabilityClick,
             onNewBookingClick = onNewBookingClick,
             isNewBookingEnabled = move == null,
@@ -240,7 +255,6 @@ private fun TimelineScreenPreview() {
             onEmptyDayClick = { _, _ -> },
             onNewBookingClick = {},
             onCheckAvailabilityClick = {},
-            onMonthTitleClick = {},
             onAction = {},
         )
     }
@@ -258,7 +272,6 @@ private fun TimelineMovePreview() {
             onEmptyDayClick = { _, _ -> },
             onNewBookingClick = {},
             onCheckAvailabilityClick = {},
-            onMonthTitleClick = {},
             onAction = {},
         )
     }

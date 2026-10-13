@@ -11,6 +11,7 @@ import com.thelazybattley.hiddenridge.core.domain.model.canMoveOn
 import com.thelazybattley.hiddenridge.core.domain.model.conflictsForMove
 import com.thelazybattley.hiddenridge.core.domain.model.movedTo
 import java.time.YearMonth
+import java.time.temporal.ChronoUnit
 
 /** A booking picked up on the timeline: [dayShift] days from where it was, in [houseId] if it changed house. */
 internal data class MoveDraft(
@@ -49,7 +50,7 @@ internal fun Timeline.toUi(draft: MoveDraft? = null): TimelineUi {
         windowStart = window.start,
         dayCount = window.dayCount,
         houseCount = houses.size,
-        months = window.months(),
+        months = window.months().map { it.withBookings(bookings, houses.size, window) },
         rows = rows,
         bookingBars = bookingsByMode.second.flatMap { booking ->
             booking.toBars(window, rows, canMove(booking), stateOf(booking))
@@ -131,6 +132,22 @@ private fun DateWindow.months(): List<TimelineMonth> =
             TimelineMonth(yearMonth = month, startIndex = indexOf(first), dayCount = indexOf(last) - indexOf(first))
         }
         .toList()
+
+/** How full [this] month is, counting nights each booking spends inside it. */
+private fun TimelineMonth.withBookings(bookings: List<Booking>, houseCount: Int, window: DateWindow): TimelineMonth {
+    val start = window.dateAt(startIndex)
+    val end = window.dateAt(startIndex + dayCount)
+    val inMonth = bookings.filter { it.overlaps(start, end) }
+    val bookedNights = inMonth.sumOf { booking ->
+        val nights = ChronoUnit.DAYS.between(maxOf(booking.checkIn, start), minOf(booking.checkOut, end))
+        nights * if (booking.isWholeResort) houseCount else booking.houseIds.size
+    }
+    val capacity = houseCount.toLong() * dayCount
+    return copy(
+        bookedFraction = if (capacity == 0L) 0f else (bookedNights.toFloat() / capacity).coerceAtMost(1f),
+        hasWholeResort = inMonth.any(Booking::isWholeResort),
+    )
+}
 
 private fun Booking.toBars(
     window: DateWindow,
