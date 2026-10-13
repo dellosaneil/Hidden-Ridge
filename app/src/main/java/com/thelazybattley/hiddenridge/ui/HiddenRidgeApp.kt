@@ -11,9 +11,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -42,14 +40,12 @@ fun HiddenRidgeApp(modifier: Modifier = Modifier) {
     }
     val notBuiltYetMessage = stringResource(R.string.not_built_yet)
     val showNotBuiltYet: () -> Unit = { showMessage(notBuiltYetMessage) }
-    // The timeline's move bar replaces the navigation bar while a booking is picked up.
-    var isMovingBooking by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
-            if (!isMovingBooking) NavigationBar {
+            NavigationBar {
                 TopLevelDestination.entries.forEach { destination ->
                     val selected = currentDestination.isOn(destination)
                     NavigationBarItem(
@@ -81,8 +77,6 @@ fun HiddenRidgeApp(modifier: Modifier = Modifier) {
         HiddenRidgeNavHost(
             navController = navController,
             onShowMessage = showMessage,
-            onNotBuiltYet = showNotBuiltYet,
-            onMovingChange = { isMovingBooking = it },
             modifier = Modifier
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding),

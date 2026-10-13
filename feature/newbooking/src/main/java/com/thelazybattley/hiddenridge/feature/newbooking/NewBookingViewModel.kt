@@ -6,8 +6,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.thelazybattley.hiddenridge.core.domain.model.Booking
 import com.thelazybattley.hiddenridge.core.domain.model.BookingDraft
+import com.thelazybattley.hiddenridge.core.domain.model.BookingStatus
 import com.thelazybattley.hiddenridge.core.domain.usecase.CreateBookingUseCase
 import com.thelazybattley.hiddenridge.core.domain.usecase.ObserveAvailabilityUseCase
+import com.thelazybattley.hiddenridge.core.domain.usecase.ObserveBookingDetailsUseCase
+import com.thelazybattley.hiddenridge.core.domain.usecase.UpdateBookingUseCase
 import com.thelazybattley.hiddenridge.feature.newbooking.navigation.NewBookingRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDate
@@ -17,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,11 +29,19 @@ import kotlinx.coroutines.launch
 class NewBookingViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     observeAvailability: ObserveAvailabilityUseCase,
+    observeBookingDetails: ObserveBookingDetailsUseCase,
     private val createBooking: CreateBookingUseCase,
+    private val updateBooking: UpdateBookingUseCase,
 ) : ViewModel() {
 
+    private val route = savedStateHandle.toRoute<NewBookingRoute>()
+    private val purpose = if (route.bookingId == null) FormPurpose.NEW else FormPurpose.EDIT
+
+    /** Null while the booking being edited loads. */
     private val form = MutableStateFlow(
-        savedStateHandle.toRoute<NewBookingRoute>().let { route ->
+        if (route.bookingId != null) {
+            null
+        } else {
             NewBookingForm.startingWith(
                 houseIds = route.houseIds,
                 wholeResort = route.wholeResort,
@@ -38,13 +50,33 @@ class NewBookingViewModel @Inject constructor(
             )
         },
     )
-    private val created = MutableStateFlow<Booking?>(null)
+    private val saved = MutableStateFlow<Booking?>(null)
+    private val isUnavailable = MutableStateFlow(false)
 
-    internal val uiState: StateFlow<NewBookingUiState> = combine(observeAvailability(), form, created) { availability, form, booking ->
-        if (booking != null) {
-            NewBookingUiState.Created(booking.guestName, booking.checkIn, booking.checkOut, booking.isOnHold)
-        } else {
-            NewBookingUiState.Editing(form.toUi(availability))
+    init {
+        route.bookingId?.let { bookingId ->
+            viewModelScope.launch {
+                val details = observeBookingDetails(bookingId).first()
+                if (details == null || details.booking.status == BookingStatus.CANCELLED) {
+                    isUnavailable.value = true
+                } else {
+                    form.value = NewBookingForm.editing(details.booking, purpose, details.today)
+                }
+            }
+        }
+    }
+
+    internal val uiState: StateFlow<NewBookingUiState> = combine(
+        observeAvailability(),
+        form,
+        saved,
+        isUnavailable,
+    ) { availability, form, booking, unavailable ->
+        when {
+            booking != null -> NewBookingUiState.Saved(purpose, booking.guestName, booking.checkIn, booking.checkOut, booking.isOnHold)
+            unavailable -> NewBookingUiState.Unavailable
+            form == null -> NewBookingUiState.Loading
+            else -> NewBookingUiState.Editing(form.toUi(availability))
         }
     }.stateIn(
         scope = viewModelScope,
@@ -55,12 +87,12 @@ class NewBookingViewModel @Inject constructor(
     internal fun onAction(action: NewBookingAction) {
         when (action) {
             is NewBookingAction.SetMode -> updateDraft { copy(mode = action.mode) }
-            is NewBookingAction.EditDate -> form.update { it.editing(action.field) }
-            is NewBookingAction.PickDate -> form.update { it.picking(action.date) }
-            is NewBookingAction.SetNights -> form.update { it.withNights(action.nights) }
-            is NewBookingAction.ShowMonth -> form.update { it.copy(visibleMonth = action.month, isMonthPickerOpen = false) }
-            NewBookingAction.ToggleMonthPicker -> form.update { it.copy(isMonthPickerOpen = !it.isMonthPickerOpen) }
-            is NewBookingAction.SelectHouseType -> form.update { it.copy(houseTypeTab = action.type) }
+            is NewBookingAction.EditDate -> form.update { it?.editing(action.field) }
+            is NewBookingAction.PickDate -> form.update { it?.picking(action.date) }
+            is NewBookingAction.SetNights -> form.update { it?.withNights(action.nights) }
+            is NewBookingAction.ShowMonth -> form.update { it?.copy(visibleMonth = action.month, isMonthPickerOpen = false) }
+            NewBookingAction.ToggleMonthPicker -> form.update { it?.copy(isMonthPickerOpen = !it.isMonthPickerOpen) }
+            is NewBookingAction.SelectHouseType -> form.update { it?.copy(houseTypeTab = action.type) }
             is NewBookingAction.ToggleHouse -> updateDraft { copy(houseIds = houseIds.toggled(action.houseId)) }
             is NewBookingAction.SetGuestName -> updateDraft { copy(guestName = action.name) }
             is NewBookingAction.SetPhone -> updateDraft { copy(phone = action.phone) }
@@ -74,21 +106,20 @@ class NewBookingViewModel @Inject constructor(
     }
 
     private fun updateDraft(change: BookingDraft.() -> BookingDraft) {
-        form.update { it.copy(draft = it.draft.change()) }
+        form.update { it?.copy(draft = it.draft.change()) }
     }
 
     private fun save() {
-        val current = form.value
+        val current = form.value ?: return
         if (current.isSaving) return
-        form.update { it.copy(isSaving = true, showProblems = true) }
+        form.update { it?.copy(isSaving = true, showProblems = true) }
         viewModelScope.launch {
-            when (val result = createBooking(current.draft)) {
-                is CreateBookingUseCase.Result.Created -> created.value = result.booking
-                // Problems and conflicts are already shown on the form once showProblems is on.
-                is CreateBookingUseCase.Result.Invalid,
-                is CreateBookingUseCase.Result.Conflicting,
-                -> form.update { it.copy(isSaving = false) }
+            val booking = when (val original = current.original) {
+                null -> (createBooking(current.draft) as? CreateBookingUseCase.Result.Created)?.booking
+                else -> (updateBooking(original, current.draft) as? UpdateBookingUseCase.Result.Updated)?.booking
             }
+            // Problems and conflicts are already shown on the form once showProblems is on.
+            if (booking != null) saved.value = booking else form.update { it?.copy(isSaving = false) }
         }
     }
 

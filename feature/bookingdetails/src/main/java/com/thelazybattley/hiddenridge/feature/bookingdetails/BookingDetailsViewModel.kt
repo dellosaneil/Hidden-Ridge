@@ -65,10 +65,7 @@ class BookingDetailsViewModel @Inject constructor(
             BookingDetailsAction.ConfirmCancel -> close(Outcome.CANCELLED) { cancelBooking(it) }
             BookingDetailsAction.ConfirmDelete -> close(Outcome.DELETED) { deleteBooking(it) }
             // Navigation is the screen's job; nothing to change here.
-            BookingDetailsAction.Reschedule,
-            BookingDetailsAction.Move,
-            BookingDetailsAction.EditDetails,
-            -> Unit
+            BookingDetailsAction.EditDetails -> Unit
         }
     }
 

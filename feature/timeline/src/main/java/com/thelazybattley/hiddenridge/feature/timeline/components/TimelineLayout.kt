@@ -4,7 +4,6 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.thelazybattley.hiddenridge.feature.timeline.TimelineRow
-import kotlin.math.abs
 
 internal object TimelineDimens {
     val DayWidth = 48.dp
@@ -41,16 +40,6 @@ internal class TimelineRowLayout(val rows: List<TimelineRow>) {
         if (y < 0.dp || y >= totalHeight) return null
         return rows[tops.indexOfLast { it <= y }]
     }
-
-    /** Where a booking bar sits in house row [rowIndex]: centered vertically. */
-    fun barTop(rowIndex: Int): Dp = tops[rowIndex] + (TimelineDimens.HouseRowHeight - TimelineDimens.BarHeight) / 2
-
-    /** The house whose row center is closest to [y], for dropping a dragged booking. */
-    fun nearestHouseTo(y: Dp): String? =
-        rows.indices
-            .filter { rows[it] is TimelineRow.House }
-            .minByOrNull { abs((tops[it] + TimelineDimens.HouseRowHeight / 2 - y).value) }
-            ?.let { (rows[it] as TimelineRow.House).houseId }
 }
 
 /** Day columns at least partly inside the viewport `[scrollPx, scrollPx + viewportPx)`. */

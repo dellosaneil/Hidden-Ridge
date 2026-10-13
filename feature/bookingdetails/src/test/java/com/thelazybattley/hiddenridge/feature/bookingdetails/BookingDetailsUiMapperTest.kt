@@ -47,12 +47,6 @@ class BookingDetailsUiMapperTest {
         assertEquals(BookingStatusUi.OnHold(until = holdUntil), ui.status)
     }
 
-    @Test
-    fun `a stay with nights left can move, a cancelled one can't`() {
-        assertEquals(true, details(houses = listOf(cabin, casita), mode = BookingMode.WHOLE_RESORT).toUi().canMove)
-        assertEquals(false, details(houses = listOf(cabin), status = BookingStatus.CANCELLED).toUi().canMove)
-    }
-
     private fun details(
         houses: List<House>,
         mode: BookingMode = BookingMode.INDIVIDUAL,

@@ -3,10 +3,7 @@ package com.thelazybattley.hiddenridge.feature.timeline.components
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.pointerInput
@@ -46,7 +42,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -55,32 +50,23 @@ import androidx.compose.ui.zIndex
 import com.thelazybattley.hiddenridge.core.designsystem.format.currentLocale
 import com.thelazybattley.hiddenridge.core.designsystem.theme.ExtendedColors
 import com.thelazybattley.hiddenridge.core.designsystem.theme.HiddenRidgeTheme
-import com.thelazybattley.hiddenridge.feature.timeline.MoveState
-import com.thelazybattley.hiddenridge.feature.timeline.MoveUi
 import com.thelazybattley.hiddenridge.feature.timeline.R
 import com.thelazybattley.hiddenridge.feature.timeline.TimelineRow
 import com.thelazybattley.hiddenridge.feature.timeline.TimelineUi
 import java.time.DayOfWeek
 import java.time.LocalDate
-import kotlin.math.roundToInt
 import java.time.format.TextStyle as DateTextStyle
 
 /**
  * The master availability grid: day columns scroll sideways under a sticky day header, house rows
  * scroll vertically beside a sticky house column. Only the visible days are drawn each frame.
- *
- * @param move the booking picked up, if any. While set, only it responds: dragging it calls
- *   [onDragTo] with the day shift and house under the finger, measured from where the drag began.
  */
 @Composable
 internal fun TimelineGrid(
     timeline: TimelineUi,
-    move: MoveUi?,
     horizontalScroll: ScrollState,
     onBookingClick: (bookingId: String) -> Unit,
-    onBookingLongClick: (bookingId: String) -> Unit,
     onEmptyDayClick: (houseId: String, date: LocalDate) -> Unit,
-    onDragTo: (dayShift: Int, houseId: String?) -> Unit,
     modifier: Modifier = Modifier,
     verticalScroll: ScrollState = rememberScrollState(),
 ) {
@@ -122,13 +108,10 @@ internal fun TimelineGrid(
             ) {
                 TimelineBody(
                     timeline = timeline,
-                    move = move,
                     rowLayout = rowLayout,
                     horizontalScroll = horizontalScroll,
                     onBookingClick = onBookingClick,
-                    onBookingLongClick = onBookingLongClick,
                     onEmptyDayClick = onEmptyDayClick,
-                    onDragTo = onDragTo,
                 )
             }
         }
@@ -276,22 +259,15 @@ private fun HouseColumn(rows: List<TimelineRow>, modifier: Modifier = Modifier) 
 @Composable
 private fun TimelineBody(
     timeline: TimelineUi,
-    move: MoveUi?,
     rowLayout: TimelineRowLayout,
     horizontalScroll: ScrollState,
     onBookingClick: (bookingId: String) -> Unit,
-    onBookingLongClick: (bookingId: String) -> Unit,
     onEmptyDayClick: (houseId: String, date: LocalDate) -> Unit,
-    onDragTo: (dayShift: Int, houseId: String?) -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
     val extendedColors = HiddenRidgeTheme.extendedColors
     val dayWidth = TimelineDimens.DayWidth
-    val isMoving = move != null
     val currentOnEmptyDayClick by rememberUpdatedState(onEmptyDayClick)
-    val currentTimeline by rememberUpdatedState(timeline)
-    val currentMove by rememberUpdatedState(move)
-    val currentOnDragTo by rememberUpdatedState(onDragTo)
 
     Box(
         Modifier
@@ -308,26 +284,7 @@ private fun TimelineBody(
                 drawContent()
                 drawNowLine(timeline.todayIndex, colors)
             }
-            .pointerInput(isMoving, rowLayout) {
-                if (!isMoving) return@pointerInput
-                // Drags that start on the lifted booking move it; any other touch still scrolls the grid.
-                awaitEachGesture {
-                    val down = awaitFirstDown(requireUnconsumed = false)
-                    val start = currentMove ?: return@awaitEachGesture
-                    if (liftedRects(currentTimeline, rowLayout).none { it.contains(down.position) }) return@awaitEachGesture
-                    down.consume()
-                    val dayPx = dayWidth.toPx()
-                    val startCenterY = start.houseRowIndex?.let { (rowLayout.tops[it] + TimelineDimens.HouseRowHeight / 2).toPx() }
-                    drag(down.id) { change ->
-                        change.consume()
-                        val delta = change.position - down.position
-                        val houseId = startCenterY?.let { rowLayout.nearestHouseTo((it + delta.y).toDp()) }
-                        currentOnDragTo(start.dayShift + (delta.x / dayPx).roundToInt(), houseId)
-                    }
-                }
-            }
-            .pointerInput(timeline, rowLayout, isMoving) {
-                if (isMoving) return@pointerInput
+            .pointerInput(timeline, rowLayout) {
                 detectTapGestures { offset ->
                     val dayIndex = (offset.x / dayWidth.toPx()).toInt()
                     val row = rowLayout.rowAt(offset.y.toDp()) as? TimelineRow.House ?: return@detectTapGestures
@@ -336,29 +293,14 @@ private fun TimelineBody(
                 }
             },
     ) {
-        timeline.ghosts.forEach { ghost ->
-            val rowIndex = ghost.rowIndex
-            GhostBarItem(
-                width = dayWidth * ghost.nights - 2.dp,
-                height = if (rowIndex == null) rowLayout.totalHeight else TimelineDimens.BarHeight,
-                modifier = Modifier.offset(
-                    x = dayWidth * (ghost.startIndex + 0.5f) + 1.dp,
-                    y = if (rowIndex == null) 0.dp else rowLayout.barTop(rowIndex),
-                ),
-            )
-        }
         timeline.resortBlocks.forEach { block ->
             key(block.bookingId) {
                 ResortBlockItem(
                     block = block,
                     width = dayWidth * block.nights - 2.dp,
                     height = rowLayout.totalHeight,
-                    isInteractive = !isMoving,
                     onClick = { onBookingClick(block.bookingId) },
-                    onLongClick = { onBookingLongClick(block.bookingId) },
-                    modifier = Modifier
-                        .zIndex(if (block.moveState == MoveState.NONE) 0f else 2f)
-                        .offset(x = dayWidth * (block.startIndex + 0.5f) + 1.dp),
+                    modifier = Modifier.offset(x = dayWidth * (block.startIndex + 0.5f) + 1.dp),
                 )
             }
         }
@@ -367,31 +309,16 @@ private fun TimelineBody(
                 BookingBarItem(
                     bar = bar,
                     width = dayWidth * bar.nights - 2.dp,
-                    isInteractive = !isMoving,
                     onClick = { onBookingClick(bar.bookingId) },
-                    onLongClick = { onBookingLongClick(bar.bookingId) },
                     // Bars run from check-in afternoon to check-out morning, so they start and end mid-column.
-                    modifier = Modifier
-                        .zIndex(if (bar.moveState == MoveState.NONE) 1f else 3f)
-                        .offset(x = dayWidth * (bar.startIndex + 0.5f) + 1.dp, y = rowLayout.barTop(bar.rowIndex)),
+                    modifier = Modifier.offset(
+                        x = dayWidth * (bar.startIndex + 0.5f) + 1.dp,
+                        y = rowLayout.tops[bar.rowIndex] + (TimelineDimens.HouseRowHeight - TimelineDimens.BarHeight) / 2,
+                    ),
                 )
             }
         }
     }
-}
-
-/** Where the lifted booking is drawn, in grid pixels, with a little slack so it's easy to grab. */
-private fun Density.liftedRects(timeline: TimelineUi, rowLayout: TimelineRowLayout): List<Rect> {
-    val dayPx = TimelineDimens.DayWidth.toPx()
-    val slack = 8.dp.toPx()
-    val bars = timeline.bookingBars.filter { it.moveState != MoveState.NONE }.map { bar ->
-        val top = rowLayout.barTop(bar.rowIndex).toPx()
-        Rect((bar.startIndex + 0.5f) * dayPx, top, (bar.startIndex + 0.5f + bar.nights) * dayPx, top + TimelineDimens.BarHeight.toPx())
-    }
-    val blocks = timeline.resortBlocks.filter { it.moveState != MoveState.NONE }.map { block ->
-        Rect((block.startIndex + 0.5f) * dayPx, 0f, (block.startIndex + 0.5f + block.nights) * dayPx, rowLayout.totalHeight.toPx())
-    }
-    return (bars + blocks).map { it.inflate(slack) }
 }
 
 private fun DrawScope.drawGrid(

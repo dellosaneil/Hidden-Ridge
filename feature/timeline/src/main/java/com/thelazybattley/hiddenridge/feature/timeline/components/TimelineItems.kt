@@ -1,9 +1,8 @@
 package com.thelazybattley.hiddenridge.feature.timeline.components
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DragIndicator
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.outlined.HourglassEmpty
@@ -28,13 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -51,7 +42,6 @@ import com.thelazybattley.hiddenridge.core.designsystem.component.rememberResort
 import com.thelazybattley.hiddenridge.core.designsystem.format.DateFormats
 import com.thelazybattley.hiddenridge.core.designsystem.format.currentLocale
 import com.thelazybattley.hiddenridge.feature.timeline.BookingBar
-import com.thelazybattley.hiddenridge.feature.timeline.MoveState
 import com.thelazybattley.hiddenridge.feature.timeline.R
 import com.thelazybattley.hiddenridge.feature.timeline.ResortBlock
 
@@ -59,66 +49,37 @@ private val ShowIconsMinWidth = 40.dp
 private val ShowNightsMinWidth = 120.dp
 private val ShowResortStatusMinWidth = 60.dp
 private val ShowResortPrefixMinWidth = 90.dp
-private val LiftedRingWidth = 2.dp
-private val LiftedElevation = 8.dp
 
-/**
- * A booking in one house: filled when confirmed, dashed when on hold. While being moved it is
- * raised with a ring, and turns to the error colors over nights another booking has.
- *
- * @param isInteractive false while any booking is being moved; the lifted one is dragged by the grid.
- */
-@OptIn(ExperimentalFoundationApi::class)
+/** A booking in one house: filled when confirmed, dashed when on hold. */
 @Composable
 internal fun BookingBarItem(
     bar: BookingBar,
     width: Dp,
-    isInteractive: Boolean,
     onClick: () -> Unit,
-    onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = MaterialTheme.colorScheme
-    val shape = RoundedCornerShape(TimelineDimens.BarCornerRadius)
     val description = stringResource(
-        when {
-            bar.moveState != MoveState.NONE -> R.string.timeline_booking_moving_description
-            bar.isOnHold -> R.string.timeline_booking_on_hold_description
-            else -> R.string.timeline_booking_description
-        },
+        if (bar.isOnHold) R.string.timeline_booking_on_hold_description else R.string.timeline_booking_description,
         bar.guestName,
         bar.houseName,
         DateFormats.stayRange(bar.checkIn, bar.checkOut, currentLocale()),
     )
-    val surface = when {
-        bar.moveState == MoveState.LIFTED_CONFLICT -> Modifier
-            .background(colors.errorContainer)
-            .border(width = 2.dp, color = colors.error, shape = shape)
-        bar.isOnHold -> Modifier
+    val surface = if (bar.isOnHold) {
+        Modifier
             .background(colors.surfaceContainerHighest)
             .dashedBorder(width = 2.dp, color = colors.outline, cornerRadius = TimelineDimens.BarCornerRadius)
-        else -> Modifier.background(colors.primaryContainer)
+    } else {
+        Modifier.background(colors.primaryContainer)
     }
-    val content = when {
-        bar.moveState == MoveState.LIFTED_CONFLICT -> colors.onErrorContainer
-        bar.isOnHold -> colors.onSurface
-        else -> colors.onPrimaryContainer
-    }
-    val pickUpLabel = stringResource(R.string.timeline_pick_up_to_move)
     val showIcons = width > ShowIconsMinWidth
 
     Row(
         modifier = modifier
             .size(width = width, height = TimelineDimens.BarHeight)
-            .then(if (bar.moveState != MoveState.NONE) Modifier.lifted(colors.primary, TimelineDimens.BarCornerRadius) else Modifier)
-            .clip(shape)
+            .clip(RoundedCornerShape(TimelineDimens.BarCornerRadius))
             .then(surface)
-            .combinedClickable(
-                enabled = isInteractive,
-                onLongClickLabel = pickUpLabel.takeIf { bar.canMove },
-                onLongClick = onLongClick.takeIf { bar.canMove },
-                onClick = onClick,
-            )
+            .clickable(onClick = onClick)
             .clearAndSetSemantics {
                 contentDescription = description
                 role = Role.Button
@@ -127,10 +88,9 @@ internal fun BookingBarItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        CompositionLocalProvider(LocalContentColor provides content) {
-            if (bar.moveState != MoveState.NONE && showIcons) {
-                Icon(Icons.Filled.DragIndicator, contentDescription = null, modifier = Modifier.size(16.dp))
-            }
+        CompositionLocalProvider(
+            LocalContentColor provides if (bar.isOnHold) colors.onSurface else colors.onPrimaryContainer,
+        ) {
             if (bar.isOnHold && showIcons) {
                 Icon(Icons.Outlined.HourglassEmpty, contentDescription = null, modifier = Modifier.size(14.dp))
             }
@@ -156,34 +116,22 @@ internal fun BookingBarItem(
 }
 
 /** A whole-resort booking: a hatched block across every house, solid when confirmed, dashed on hold. */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun ResortBlockItem(
     block: ResortBlock,
     width: Dp,
     height: Dp,
-    isInteractive: Boolean,
     onClick: () -> Unit,
-    onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = MaterialTheme.colorScheme
     val shape = RoundedCornerShape(TimelineDimens.BarCornerRadius)
     val description = stringResource(
-        when {
-            block.moveState != MoveState.NONE -> R.string.timeline_resort_moving_description
-            block.isOnHold -> R.string.timeline_resort_hold_description
-            else -> R.string.timeline_resort_description
-        },
+        if (block.isOnHold) R.string.timeline_resort_hold_description else R.string.timeline_resort_description,
         block.guestName,
         DateFormats.stayRange(block.checkIn, block.checkOut, currentLocale()),
     )
-    val pickUpLabel = stringResource(R.string.timeline_pick_up_to_move)
-    val surface = if (block.moveState == MoveState.LIFTED_CONFLICT) {
-        Modifier
-            .background(colors.errorContainer)
-            .border(width = 2.dp, color = colors.error, shape = shape)
-    } else if (block.isOnHold) {
+    val surface = if (block.isOnHold) {
         Modifier
             .background(colors.surface)
             .background(rememberResortHoldHatchBrush())
@@ -197,15 +145,9 @@ internal fun ResortBlockItem(
     Box(
         modifier = modifier
             .size(width = width, height = height)
-            .then(if (block.moveState != MoveState.NONE) Modifier.lifted(colors.primary, TimelineDimens.BarCornerRadius) else Modifier)
             .clip(shape)
             .then(surface)
-            .combinedClickable(
-                enabled = isInteractive,
-                onLongClickLabel = pickUpLabel.takeIf { block.canMove },
-                onLongClick = onLongClick.takeIf { block.canMove },
-                onClick = onClick,
-            )
+            .clickable(onClick = onClick)
             .clearAndSetSemantics {
                 contentDescription = description
                 role = Role.Button
@@ -234,13 +176,12 @@ internal fun ResortBlockItem(
 private fun ResortTitle(block: ResortBlock, showPrefix: Boolean, modifier: Modifier = Modifier) {
     val colors = MaterialTheme.colorScheme
     val shape = RoundedCornerShape(6.dp)
-    val isConflict = block.moveState == MoveState.LIFTED_CONFLICT
-    val surface = when {
-        isConflict -> Modifier.background(colors.error)
-        block.isOnHold -> Modifier
+    val surface = if (block.isOnHold) {
+        Modifier
             .background(colors.surface)
             .dashedBorder(width = 1.dp, color = colors.tertiary, cornerRadius = 6.dp, dashLength = 3.dp, gapLength = 2.dp)
-        else -> Modifier.background(colors.tertiary)
+    } else {
+        Modifier.background(colors.tertiary)
     }
     val title = when {
         !showPrefix -> block.guestName
@@ -255,12 +196,7 @@ private fun ResortTitle(block: ResortBlock, showPrefix: Boolean, modifier: Modif
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        val content = when {
-            isConflict -> colors.onError
-            block.isOnHold -> colors.tertiary
-            else -> colors.onTertiary
-        }
-        CompositionLocalProvider(LocalContentColor provides content) {
+        CompositionLocalProvider(LocalContentColor provides if (block.isOnHold) colors.tertiary else colors.onTertiary) {
             Icon(
                 imageVector = if (block.isOnHold) Icons.Outlined.HourglassEmpty else Icons.Filled.Lock,
                 contentDescription = null,
@@ -306,27 +242,3 @@ private fun ResortStatusPill(block: ResortBlock, modifier: Modifier = Modifier) 
             .padding(horizontal = 8.dp, vertical = 2.dp),
     )
 }
-
-/** The dashed outline left where a booking was picked up from, so staff can see how far it has moved. */
-@Composable
-internal fun GhostBarItem(width: Dp, height: Dp, modifier: Modifier = Modifier) {
-    Box(
-        modifier
-            .size(width = width, height = height)
-            .dashedBorder(width = 2.dp, color = MaterialTheme.colorScheme.outline, cornerRadius = TimelineDimens.BarCornerRadius),
-    )
-}
-
-/** Raises a picked-up booking: a shadow, and a ring just outside its edge. */
-private fun Modifier.lifted(ring: Color, cornerRadius: Dp): Modifier = this
-    .shadow(elevation = LiftedElevation, shape = RoundedCornerShape(cornerRadius), clip = false)
-    .drawBehind {
-        val stroke = LiftedRingWidth.toPx()
-        drawRoundRect(
-            color = ring,
-            topLeft = Offset(-stroke / 2, -stroke / 2),
-            size = Size(size.width + stroke, size.height + stroke),
-            cornerRadius = CornerRadius(cornerRadius.toPx() + stroke / 2),
-            style = Stroke(width = stroke),
-        )
-    }

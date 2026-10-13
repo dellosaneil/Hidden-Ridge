@@ -31,11 +31,16 @@ data class BookingDraft(
     fun holdUntil(today: LocalDate): LocalDate? =
         if (isHold) checkIn?.let { HoldRelease.date(today, it, holdDays) } else null
 
-    /** What still stops this draft from being saved, in the order the form asks for it. */
-    fun problems(today: LocalDate): List<DraftProblem> = buildList {
+    /**
+     * What still stops this draft from being saved, in the order the form asks for it.
+     *
+     * @param keptCheckIn an existing booking's check-in, which may stay in the past once the
+     *   guest has arrived; only a new past date is a problem.
+     */
+    fun problems(today: LocalDate, keptCheckIn: LocalDate? = null): List<DraftProblem> = buildList {
         when {
             checkIn == null -> add(DraftProblem.MISSING_CHECK_IN)
-            checkIn.isBefore(today) -> add(DraftProblem.CHECK_IN_IN_PAST)
+            checkIn.isBefore(today) && checkIn != keptCheckIn -> add(DraftProblem.CHECK_IN_IN_PAST)
             !hasDates -> add(DraftProblem.MISSING_CHECK_OUT)
         }
         if (!isWholeResort && houseIds.isEmpty()) add(DraftProblem.NO_HOUSES)
@@ -47,6 +52,20 @@ data class BookingDraft(
         const val DEFAULT_GUEST_COUNT = 2
     }
 }
+
+/** This booking as a draft to edit; a hold keeps its release date, as days from [today]. */
+fun Booking.toDraft(today: LocalDate): BookingDraft = BookingDraft(
+    mode = mode,
+    houseIds = houseIds,
+    checkIn = checkIn,
+    checkOut = checkOut,
+    guestName = guestName,
+    phone = phone,
+    guestCount = guestCount,
+    status = if (isOnHold) BookingStatus.HOLD else BookingStatus.CONFIRMED,
+    holdDays = holdUntil?.let { ChronoUnit.DAYS.between(today, it).toInt().coerceAtLeast(0) } ?: HoldRelease.DEFAULT_DAYS,
+    note = note,
+)
 
 enum class DraftProblem {
     MISSING_CHECK_IN,

@@ -32,8 +32,6 @@ internal enum class Outcome(@StringRes val message: Int) {
 }
 
 internal sealed interface BookingDetailsAction {
-    data object Reschedule : BookingDetailsAction
-    data object Move : BookingDetailsAction
     data object EditDetails : BookingDetailsAction
     data object ToggleHold : BookingDetailsAction
     data object RequestCancel : BookingDetailsAction
@@ -56,8 +54,6 @@ internal data class BookingDetailsUi(
     val guestCount: Int,
     val phone: String,
     val note: String,
-    /** Whether the stay can still be moved; false once it has checked out. */
-    val canMove: Boolean,
 ) {
     val isOnHold: Boolean get() = status is BookingStatusUi.OnHold
 }

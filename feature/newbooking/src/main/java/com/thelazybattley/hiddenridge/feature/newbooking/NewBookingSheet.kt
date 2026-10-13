@@ -64,19 +64,24 @@ internal fun NewBookingSheet(
         scope.launch { sheetState.hide() }.invokeOnCompletion { onDismiss() }
     }
 
-    val created = uiState as? NewBookingUiState.Created
-    if (created != null) {
-        LaunchedEffect(created) {
-            val range = DateFormats.stayRange(created.checkIn, created.checkOut, locale)
-            val message = if (created.isHold) R.string.message_held else R.string.message_booked
-            onShowMessage(resources.getString(message, created.guestName, range))
+    when (val state = uiState) {
+        is NewBookingUiState.Saved -> LaunchedEffect(state) {
+            val range = DateFormats.stayRange(state.checkIn, state.checkOut, locale)
+            val message = when (state.purpose) {
+                FormPurpose.NEW ->
+                    resources.getString(if (state.isHold) R.string.message_held else R.string.message_booked, state.guestName, range)
+                FormPurpose.EDIT -> resources.getString(R.string.message_updated)
+            }
+            onShowMessage(message)
             hideThenDismiss()
         }
+        NewBookingUiState.Unavailable -> LaunchedEffect(state) { hideThenDismiss() }
+        else -> Unit
     }
 
     TallDestinationBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         when (val state = uiState) {
-            NewBookingUiState.Loading, is NewBookingUiState.Created -> Box(
+            NewBookingUiState.Loading, is NewBookingUiState.Saved, NewBookingUiState.Unavailable -> Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center,
             ) { CircularProgressIndicator() }
@@ -108,7 +113,12 @@ internal fun NewBookingContent(
                 Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.action_discard))
             }
             Text(
-                text = stringResource(R.string.new_booking_title),
+                text = stringResource(
+                    when (form.purpose) {
+                        FormPurpose.NEW -> R.string.new_booking_title
+                        FormPurpose.EDIT -> R.string.edit_title
+                    },
+                ),
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier
                     .weight(1f)

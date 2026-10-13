@@ -25,8 +25,6 @@ fun NavController.closeBookingDetails() {
  */
 fun NavGraphBuilder.bookingDetailsSheet(
     onDismiss: () -> Unit,
-    onReschedule: (bookingId: String) -> Unit,
-    onMove: (bookingId: String) -> Unit,
     onEditDetails: (bookingId: String) -> Unit,
     onShowMessage: (message: String) -> Unit,
 ) {
@@ -35,8 +33,6 @@ fun NavGraphBuilder.bookingDetailsSheet(
     ) {
         BookingDetailsSheet(
             onDismiss = onDismiss,
-            onReschedule = onReschedule,
-            onMove = onMove,
             onEditDetails = onEditDetails,
             onShowMessage = onShowMessage,
         )

@@ -44,8 +44,6 @@
     <string name="fact_phone_call">Call</string>
     <string name="fact_note">Note</string>
 
-    <string name="action_reschedule">Reschedule</string>
-    <string name="action_move">Move</string>
     <string name="action_edit_details">Edit details</string>
     <string name="action_put_on_hold">Put on hold</string>
     <string name="action_confirm_booking">Confirm booking</string>

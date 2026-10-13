@@ -1,18 +1,23 @@
 package com.thelazybattley.hiddenridge.feature.newbooking
 
 import com.thelazybattley.hiddenridge.core.domain.model.Availability
+import com.thelazybattley.hiddenridge.core.domain.model.Booking
 import com.thelazybattley.hiddenridge.core.domain.model.BookingConflict
 import com.thelazybattley.hiddenridge.core.domain.model.BookingDraft
 import com.thelazybattley.hiddenridge.core.domain.model.BookingMode
 import com.thelazybattley.hiddenridge.core.domain.model.House
 import com.thelazybattley.hiddenridge.core.domain.model.HouseType
 import com.thelazybattley.hiddenridge.core.domain.model.StayRequest
+import com.thelazybattley.hiddenridge.core.domain.model.toDraft
 import java.time.LocalDate
 import java.time.YearMonth
 
 /** Everything the user has entered or toggled; the screen is derived from this plus [Availability]. */
 internal data class NewBookingForm(
     val draft: BookingDraft,
+    val purpose: FormPurpose = FormPurpose.NEW,
+    /** The booking being edited; null for a new one. */
+    val original: Booking? = null,
     val editingDate: DateField = DateField.CHECK_IN,
     /** The month the calendar shows; null follows check-in, or today before one is picked. */
     val visibleMonth: YearMonth? = null,
@@ -37,10 +42,20 @@ internal data class NewBookingForm(
                 checkOut = checkOut ?: checkIn?.plusDays(1),
             ),
         )
+
+        /** Every field filled from [booking], ready to change. */
+        fun editing(booking: Booking, purpose: FormPurpose, today: LocalDate) = NewBookingForm(
+            draft = booking.toDraft(today),
+            purpose = purpose,
+            original = booking,
+        )
     }
 }
 
-internal fun NewBookingForm.toUi(availability: Availability): NewBookingFormUi {
+internal fun NewBookingForm.toUi(allAvailability: Availability): NewBookingFormUi {
+    // A booking being edited never stands in its own way.
+    val availability = original?.let { editing -> allAvailability.copy(bookings = allAvailability.bookings.filter { it.id != editing.id }) }
+        ?: allAvailability
     val request = draft.stayRequest()
     val housesById = availability.houses.associateBy(House::id)
     val selectedHouses = availability.houses.filter { it.id in draft.houseIds }
@@ -50,6 +65,7 @@ internal fun NewBookingForm.toUi(availability: Availability): NewBookingFormUi {
         ?: HouseType.CABIN
 
     return NewBookingFormUi(
+        purpose = purpose,
         draft = draft,
         editingDate = editingDate,
         calendar = calendar(availability),
@@ -73,7 +89,7 @@ internal fun NewBookingForm.toUi(availability: Availability): NewBookingFormUi {
         capacity = (if (draft.isWholeResort) availability.houses else selectedHouses).sumOf(House::sleeps),
         holdUntil = draft.holdUntil(availability.today),
         conflicts = request?.let(availability::conflictsFor).orEmpty().map { it.toUi(housesById) },
-        problems = draft.problems(availability.today),
+        problems = draft.problems(availability.today, keptCheckIn = original?.checkIn),
         showProblems = showProblems,
         isSaving = isSaving,
     )

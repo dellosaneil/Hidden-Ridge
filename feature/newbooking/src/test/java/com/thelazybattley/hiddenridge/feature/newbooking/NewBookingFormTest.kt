@@ -43,6 +43,25 @@ class NewBookingFormTest {
     )
 
     @Test
+    fun `editing a booking starts from its own fields and never clashes with itself`() {
+        val ui = NewBookingForm.editing(herrera, FormPurpose.EDIT, today).toUi(availability)
+
+        assertEquals("Herrera", ui.draft.guestName)
+        assertEquals(listOf("ca"), ui.draft.houseIds)
+        assertTrue(ui.conflicts.isEmpty())
+        assertEquals(HouseTileState.SELECTED, ui.houses.single { it.houseId == "ca" }.state)
+    }
+
+    @Test
+    fun `an in-house stay keeps its past check-in when edited`() {
+        val inHouse = herrera.copy(checkIn = today.minusDays(1))
+
+        val ui = NewBookingForm.editing(inHouse, FormPurpose.EDIT, today).toUi(availability)
+
+        assertTrue(ui.problems.isEmpty())
+    }
+
+    @Test
     fun `a house tile shows who holds it for the chosen dates`() {
         val form = NewBookingForm(
             draft = BookingDraft(checkIn = today.plusDays(3), checkOut = today.plusDays(4)),

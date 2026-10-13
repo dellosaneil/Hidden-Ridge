@@ -18,12 +18,9 @@ import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.EventBusy
-import androidx.compose.material.icons.outlined.EventRepeat
 import androidx.compose.material.icons.outlined.HourglassEmpty
-import androidx.compose.material.icons.outlined.OpenWith
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -43,15 +40,12 @@ private val ActionHeight = 48.dp
 private val ActionPadding = PaddingValues(horizontal = 12.dp)
 
 /**
- * Three tiers, by consequence: the main changes (filled, tonal), smaller edits (outlined),
- * then the destructive pair set apart below a divider in the error color.
- *
- * @param canMove false hides Move, for stays that have already checked out.
+ * Two tiers, by consequence: editing (filled) and the hold toggle (outlined), then the
+ * destructive pair set apart below a divider in the error color.
  */
 @Composable
 internal fun BookingActions(
     isOnHold: Boolean,
-    canMove: Boolean,
     onAction: (BookingDetailsAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -59,20 +53,6 @@ internal fun BookingActions(
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         ActionRow {
             Button(
-                onClick = { onAction(BookingDetailsAction.Reschedule) },
-                contentPadding = ActionPadding,
-                modifier = actionModifier(),
-            ) { ActionLabel(Icons.Outlined.EventRepeat, R.string.action_reschedule) }
-            if (canMove) {
-                FilledTonalButton(
-                    onClick = { onAction(BookingDetailsAction.Move) },
-                    contentPadding = ActionPadding,
-                    modifier = actionModifier(),
-                ) { ActionLabel(Icons.Outlined.OpenWith, R.string.action_move) }
-            }
-        }
-        ActionRow {
-            OutlinedButton(
                 onClick = { onAction(BookingDetailsAction.EditDetails) },
                 contentPadding = ActionPadding,
                 modifier = actionModifier(),

@@ -11,7 +11,6 @@ import java.time.LocalDate
 import java.time.YearMonth
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -94,78 +93,6 @@ class TimelineUiMapperTest {
         assertEquals(9f / (3 * 31), months.getValue(YearMonth.of(2026, 12)).bookedFraction, 0.0001f)
         assertTrue(months.getValue(YearMonth.of(2026, 12)).hasWholeResort)
         assertFalse(months.getValue(YearMonth.of(2026, 11)).hasWholeResort)
-    }
-
-    @Test
-    fun `a picked-up booking that hasn't moved is lifted with no ghost and nothing to save`() {
-        val stay = booking(houseIds = listOf("c1"), checkIn = today.plusDays(2), checkOut = today.plusDays(4))
-        val timeline = timeline(bookings = listOf(stay))
-        val draft = MoveDraft(bookingId = "b1")
-
-        val ui = timeline.toUi(draft)
-        val move = timeline.moveUi(draft, isSaving = false)!!
-
-        assertEquals(MoveState.LIFTED, ui.bookingBars.single().moveState)
-        assertTrue(ui.ghosts.isEmpty())
-        assertEquals(MoveStatus.NotMoved, move.status)
-        assertFalse(move.canSave)
-    }
-
-    @Test
-    fun `dragging to a free house and day leaves a ghost and is ready to save`() {
-        val stay = booking(houseIds = listOf("c1"), checkIn = today.plusDays(2), checkOut = today.plusDays(4))
-        val timeline = timeline(bookings = listOf(stay))
-        val draft = MoveDraft(bookingId = "b1", dayShift = 1, houseId = "c2")
-
-        val ui = timeline.toUi(draft)
-        val move = timeline.moveUi(draft, isSaving = false)!!
-
-        val bar = ui.bookingBars.single()
-        assertEquals(2, bar.rowIndex)
-        assertEquals(44, bar.startIndex)
-        assertEquals(listOf(GhostBar(rowIndex = 1, startIndex = 43, nights = 2)), ui.ghosts)
-        assertEquals(listOf("Cabin 2"), move.houseNames)
-        assertEquals(MoveStatus.Ready, move.status)
-        assertTrue(move.canSave)
-    }
-
-    @Test
-    fun `landing on another booking shows the overlap and blocks saving`() {
-        val stay = booking(houseIds = listOf("c1"), checkIn = today.plusDays(2), checkOut = today.plusDays(4))
-        val other = booking(houseIds = listOf("c2"), checkIn = today.plusDays(3), checkOut = today.plusDays(5)).copy(id = "b2", guestName = "Other")
-        val timeline = timeline(bookings = listOf(stay, other))
-        val draft = MoveDraft(bookingId = "b1", houseId = "c2")
-
-        val ui = timeline.toUi(draft)
-        val move = timeline.moveUi(draft, isSaving = false)!!
-
-        assertEquals(MoveState.LIFTED_CONFLICT, ui.bookingBars.first { it.bookingId == "b1" }.moveState)
-        assertEquals("Other", (move.status as MoveStatus.Overlaps).guestName)
-        assertFalse(move.canSave)
-        assertFalse(ui.bookingBars.first { it.bookingId == "b2" }.canMove)
-    }
-
-    @Test
-    fun `a group keeps its houses and only offers date arrows`() {
-        val group = booking(houseIds = listOf("c1", "c2"), checkIn = today.plusDays(2), checkOut = today.plusDays(4))
-        val timeline = timeline(bookings = listOf(group))
-        val draft = MoveDraft(bookingId = "b1", dayShift = 1, houseId = "ca")
-
-        val move = timeline.moveUi(draft, isSaving = false)!!
-
-        assertEquals(listOf("Cabin 1", "Cabin 2"), move.houseNames)
-        assertFalse(move.canChangeHouse)
-        assertNull(move.houseRowIndex)
-    }
-
-    @Test
-    fun `a stay already under way can't go earlier`() {
-        val inHouse = booking(houseIds = listOf("c1"), checkIn = today.minusDays(1), checkOut = today.plusDays(2))
-
-        val move = timeline(bookings = listOf(inHouse)).moveUi(MoveDraft(bookingId = "b1"), isSaving = false)!!
-
-        assertFalse(move.canGoEarlier)
-        assertTrue(move.canGoLater)
     }
 
     private fun timeline(bookings: List<Booking>) = Timeline(

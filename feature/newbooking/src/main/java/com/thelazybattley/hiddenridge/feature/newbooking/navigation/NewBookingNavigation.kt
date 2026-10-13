@@ -10,7 +10,8 @@ import kotlinx.serialization.Serializable
 
 /**
  * Everything is optional: the form can open empty, or prefilled from a tapped night on the
- * timeline or a stay found free in Check availability.
+ * timeline or a stay found free in Check availability. With [bookingId] it edits that booking
+ * instead.
  */
 @Serializable
 data class NewBookingRoute(
@@ -18,6 +19,7 @@ data class NewBookingRoute(
     val wholeResort: Boolean = false,
     val checkInEpochDay: Long? = null,
     val checkOutEpochDay: Long? = null,
+    val bookingId: String? = null,
 )
 
 fun NavController.navigateToNewBooking(
@@ -35,12 +37,17 @@ fun NavController.navigateToNewBooking(
     navigate(route) { launchSingleTop = true }
 }
 
+/** The booking form on an existing booking, for any of its details. */
+fun NavController.navigateToEditBooking(bookingId: String) {
+    navigate(NewBookingRoute(bookingId = bookingId)) { launchSingleTop = true }
+}
+
 /** Closes the form; safe to call when it is already gone. */
 fun NavController.closeNewBooking() {
     popBackStack<NewBookingRoute>(inclusive = true)
 }
 
-/** The new booking form, shown as a full-height bottom sheet. */
+/** The booking form, new or editing, shown as a full-height bottom sheet. */
 fun NavGraphBuilder.newBookingSheet(
     onDismiss: () -> Unit,
     onShowMessage: (message: String) -> Unit,

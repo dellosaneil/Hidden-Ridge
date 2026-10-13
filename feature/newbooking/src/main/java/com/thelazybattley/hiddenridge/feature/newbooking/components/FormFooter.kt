@@ -32,6 +32,7 @@ import com.thelazybattley.hiddenridge.core.designsystem.format.DateFormats
 import com.thelazybattley.hiddenridge.core.designsystem.format.currentLocale
 import com.thelazybattley.hiddenridge.core.domain.model.DraftProblem
 import com.thelazybattley.hiddenridge.feature.newbooking.ConflictUi
+import com.thelazybattley.hiddenridge.feature.newbooking.FormPurpose
 import com.thelazybattley.hiddenridge.feature.newbooking.NewBookingFormUi
 import com.thelazybattley.hiddenridge.feature.newbooking.R
 
@@ -66,7 +67,14 @@ internal fun FormFooter(
                 if (form.isSaving) {
                     CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
                 } else {
-                    Text(stringResource(if (form.draft.isHold) R.string.create_hold else R.string.create_booking))
+                    Text(
+                        stringResource(
+                            when (form.purpose) {
+                                FormPurpose.NEW -> if (form.draft.isHold) R.string.create_hold else R.string.create_booking
+                                FormPurpose.EDIT -> R.string.save_changes
+                            },
+                        ),
+                    )
                 }
             }
         }

@@ -14,14 +14,21 @@ internal sealed interface NewBookingUiState {
 
     data class Editing(val form: NewBookingFormUi) : NewBookingUiState
 
-    /** Saved; the sheet should close and confirm what was booked. */
-    data class Created(
+    /** Saved; the sheet should close and confirm what was booked or changed. */
+    data class Saved(
+        val purpose: FormPurpose,
         val guestName: String,
         val checkIn: LocalDate,
         val checkOut: LocalDate,
         val isHold: Boolean,
     ) : NewBookingUiState
+
+    /** The booking being edited was deleted or cancelled meanwhile; the sheet should close. */
+    data object Unavailable : NewBookingUiState
 }
+
+/** What the form is for: the same fields, titled and confirmed differently. */
+internal enum class FormPurpose { NEW, EDIT }
 
 /** Which date the next calendar tap sets. */
 internal enum class DateField { CHECK_IN, CHECK_OUT }
@@ -47,6 +54,7 @@ internal sealed interface NewBookingAction {
 
 @Immutable
 internal data class NewBookingFormUi(
+    val purpose: FormPurpose,
     val draft: BookingDraft,
     val editingDate: DateField,
     val calendar: CalendarUi,
