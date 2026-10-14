@@ -1,8 +1,10 @@
 package com.thelazybattley.hiddenridge.core.data.sample
 
+import com.thelazybattley.hiddenridge.core.data.mapper.toEntity
 import com.thelazybattley.hiddenridge.core.database.entity.BookingEntity
 import com.thelazybattley.hiddenridge.core.database.entity.BookingHouseCrossRef
 import com.thelazybattley.hiddenridge.core.database.entity.HouseEntity
+import com.thelazybattley.hiddenridge.core.database.entity.HouseTypeEntity
 import com.thelazybattley.hiddenridge.core.domain.model.BookingMode
 import com.thelazybattley.hiddenridge.core.domain.model.BookingStatus
 import com.thelazybattley.hiddenridge.core.domain.model.HouseType
@@ -25,8 +27,10 @@ internal object SampleData {
         Triple("f1", "Ridge House", HouseType.FAMILY_HOUSE),
         Triple("f2", "Lake House", HouseType.FAMILY_HOUSE),
     ).mapIndexed { index, (id, name, type) ->
-        HouseEntity(id = id, name = name, type = type.name, sortOrder = index)
+        HouseEntity(id = id, name = name, type = type.id, sortOrder = index, sleeps = type.sleeps)
     }
+
+    val houseTypes: List<HouseTypeEntity> = HouseType.BUILT_IN.mapIndexed { index, type -> type.toEntity(sortOrder = index) }
 
     private val bookings: List<SampleBooking> = listOf(
         SampleBooking("Reyes family", listOf("f1"), fromToday = -3, nights = 3, guests = 6, phone = "(555) 201-4410"),

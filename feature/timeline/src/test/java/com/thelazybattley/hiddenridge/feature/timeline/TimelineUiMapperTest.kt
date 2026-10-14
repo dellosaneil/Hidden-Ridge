@@ -18,13 +18,13 @@ class TimelineUiMapperTest {
 
     private val today = LocalDate.of(2026, 10, 12)
     private val houses = listOf(
-        House("ca", "Casita A", HouseType.CASITA),
         House("c1", "Cabin 1", HouseType.CABIN),
+        House("ca", "Casita A", HouseType.CASITA),
         House("c2", "Cabin 2", HouseType.CABIN),
     )
 
     @Test
-    fun `houses are grouped by type in type order`() {
+    fun `houses are grouped by type, types in the order they're first listed`() {
         val ui = timeline(bookings = emptyList()).toUi()
 
         assertEquals(

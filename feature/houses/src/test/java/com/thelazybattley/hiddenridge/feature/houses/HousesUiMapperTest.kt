@@ -16,21 +16,21 @@ class HousesUiMapperTest {
     /** A Monday. */
     private val today = LocalDate.of(2026, 10, 12)
     private val houses = listOf(
-        House("f1", "Ridge House", HouseType.FAMILY_HOUSE),
         House("c1", "Cabin 1", HouseType.CABIN),
-        House("c2", "Cabin 2", HouseType.CABIN),
         House("ca", "Casita A", HouseType.CASITA),
+        House("c2", "Cabin 2", HouseType.CABIN),
+        House("f1", "Ridge House", HouseType.FAMILY_HOUSE),
     )
 
     @Test
-    fun `houses are grouped under a header per type in type order`() {
+    fun `houses are grouped under a header per type, types in the order they're first listed`() {
         val ui = ui()
 
         assertEquals(
             listOf("group:CABIN", "c1", "c2", "group:CASITA", "ca", "group:FAMILY_HOUSE", "f1"),
             ui.rows.map { row ->
                 when (row) {
-                    is HousesRow.Group -> "group:${row.type}"
+                    is HousesRow.Group -> "group:${row.type.id}"
                     is HousesRow.House -> row.house.houseId
                 }
             },
@@ -151,6 +151,19 @@ class HousesUiMapperTest {
 
         assertEquals(4, ui.house("c1").action?.houseCount)
         assertEquals(4, ui.arrivingToday)
+    }
+
+    @Test
+    fun `a house that opens later is closed until then`() {
+        val opening = House("c4", "Cabin 4", HouseType.CABIN, bookableFrom = today.plusDays(3))
+        val ui = houseRoster(today, houses + opening, emptyList()).toUi(HousesFilter.ALL, DayOfWeek.SUNDAY)
+
+        val c4 = ui.house("c4")
+        assertEquals(HouseSummary.OpensOn(today.plusDays(3)), c4.summary)
+        assertEquals(today.plusDays(3), c4.opensOn)
+        val c = NightState.CLOSED
+        val f = NightState.FREE
+        assertEquals(listOf(c, c, c, c, f, f, f), c4.nights)
     }
 
     @Test

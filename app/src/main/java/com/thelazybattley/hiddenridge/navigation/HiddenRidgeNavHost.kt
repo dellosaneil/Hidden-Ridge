@@ -6,6 +6,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.thelazybattley.hiddenridge.R
+import com.thelazybattley.hiddenridge.feature.addhouse.navigation.addHouseSheet
+import com.thelazybattley.hiddenridge.feature.addhouse.navigation.closeAddHouse
+import com.thelazybattley.hiddenridge.feature.addhouse.navigation.navigateToAddHouse
 import com.thelazybattley.hiddenridge.feature.availability.navigation.availabilitySheet
 import com.thelazybattley.hiddenridge.feature.availability.navigation.closeAvailability
 import com.thelazybattley.hiddenridge.feature.availability.navigation.navigateToAvailability
@@ -40,12 +43,17 @@ fun HiddenRidgeNavHost(
             onEmptyDayClick = { houseId, date -> navController.navigateToNewBooking(houseIds = listOf(houseId), checkIn = date) },
             onNewBookingClick = { navController.navigateToNewBooking() },
             onCheckAvailabilityClick = { navController.navigateToAvailability() },
+            onAddHouseClick = navController::navigateToAddHouse,
         )
         housesScreen(
             onBookingClick = navController::navigateToBookingDetails,
             onFreeHouseClick = { houseId, checkIn -> navController.navigateToNewBooking(houseIds = listOf(houseId), checkIn = checkIn) },
             onSearchClick = { onShowMessage(notBuiltYetMessage) },
-            onAddHouseClick = { onShowMessage(notBuiltYetMessage) },
+            onAddHouseClick = navController::navigateToAddHouse,
+        )
+        addHouseSheet(
+            onDismiss = navController::closeAddHouse,
+            onShowMessage = onShowMessage,
         )
         bookingDetailsSheet(
             onDismiss = navController::closeBookingDetails,

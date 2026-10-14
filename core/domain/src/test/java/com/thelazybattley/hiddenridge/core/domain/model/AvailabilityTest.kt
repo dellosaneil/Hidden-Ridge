@@ -71,6 +71,27 @@ class AvailabilityTest {
         )
     }
 
+    @Test
+    fun `a house is not free before it opens`() {
+        val opening = House("c3", "Cabin 3", HouseType.CABIN, bookableFrom = day(3))
+        val availability = availability().copy(houses = houses + opening)
+
+        assertFalse(availability.isFree("c3", day(1), day(4)))
+        assertTrue(availability.isFree("c3", day(3), day(5)))
+        assertEquals(listOf("c3"), availability.closedFor(StayRequest(BookingMode.INDIVIDUAL, listOf("c3"), day(2), day(4))).map(House::id))
+        assertEquals(emptyList<House>(), availability.closedFor(StayRequest(BookingMode.WHOLE_RESORT, emptyList(), day(2), day(4))))
+        assertEquals(setOf(day(1), day(2)), availability.blockedNights(BookingMode.INDIVIDUAL, listOf("c3"), day(1), day(4)))
+        assertEquals(setOf("c3"), availability.occupancyOn(day(2)).closedHouseIds)
+    }
+
+    @Test
+    fun `nights are blocked when every house is booked or not open yet`() {
+        val opening = House("c3", "Cabin 3", HouseType.CABIN, bookableFrom = day(3))
+        val availability = availability(stay("b1", listOf("c1", "c2"), from = 0, to = 5)).copy(houses = houses + opening)
+
+        assertEquals(setOf(day(0), day(1), day(2)), availability.blockedNights(BookingMode.INDIVIDUAL, emptyList(), day(0), day(5)))
+    }
+
     private fun day(offset: Long) = today.plusDays(offset)
 
     private fun availability(vararg bookings: Booking) = Availability(

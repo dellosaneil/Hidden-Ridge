@@ -118,6 +118,8 @@ internal data class HouseTileUi(
     val shortLabel: String,
     val state: HouseTileState,
     val takenBy: TakenBy?,
+    /** When the house first takes guests, if that's after the chosen check-in. */
+    val opensOn: LocalDate? = null,
 ) {
     val isSelected: Boolean get() = state == HouseTileState.SELECTED || state == HouseTileState.SELECTED_BUT_TAKEN
 }

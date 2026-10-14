@@ -52,6 +52,7 @@
 
     <string name="house_sleeps">· sleeps %1$d</string>
     <string name="house_free_all_nights">Free all nights</string>
+    <string name="house_opens_on">Not open until %1$s</string>
     <string name="house_taken_by">%1$s · %2$s</string>
     <string name="house_taken_by_hold">%1$s (hold) · %2$s</string>
     <string name="house_taken_by_resort">Whole resort · %1$s</string>

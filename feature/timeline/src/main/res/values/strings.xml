@@ -3,6 +3,11 @@
         <item quantity="one">Hidden Ridge · %1$d house</item>
         <item quantity="other">Hidden Ridge · %1$d houses</item>
     </plurals>
+    <string name="timeline_property_label_empty">Hidden Ridge · no houses yet</string>
+    <string name="timeline_empty_title">No houses yet</string>
+    <string name="timeline_empty_body">Add the houses at Hidden Ridge and each one gets a row here. Then you can start taking bookings.</string>
+    <string name="timeline_empty_action">Add your first house</string>
+    <string name="timeline_empty_hint">You can add more any time from the Houses tab.</string>
     <string name="timeline_change_month">Go to another month</string>
     <string name="timeline_check_availability">Check availability</string>
     <string name="timeline_new_booking">New</string>
@@ -10,9 +15,6 @@
     <string name="timeline_go_to_today">Go to today, %1$s</string>
     <string name="timeline_house_column">House</string>
 
-    <string name="timeline_group_cabins">Cabins</string>
-    <string name="timeline_group_casitas">Casitas</string>
-    <string name="timeline_group_family_houses">Family houses</string>
 
     <string name="timeline_legend_free">Free</string>
     <string name="timeline_legend_booked">Booked</string>

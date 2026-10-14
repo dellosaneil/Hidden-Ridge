@@ -14,6 +14,7 @@ class SampleDataSeeder @Inject internal constructor(
         database.withTransaction {
             if (database.houseDao().count() > 0) return@withTransaction
             val today = dateProvider.today()
+            database.houseDao().upsertTypes(SampleData.houseTypes)
             database.houseDao().upsertAll(SampleData.houses)
             database.bookingDao().upsertAll(
                 bookings = SampleData.bookingEntities(today),

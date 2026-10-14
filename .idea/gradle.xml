@@ -16,8 +16,10 @@
             <option value="$PROJECT_DIR$/core/designsystem" />
             <option value="$PROJECT_DIR$/core/domain" />
             <option value="$PROJECT_DIR$/feature" />
+            <option value="$PROJECT_DIR$/feature/addhouse" />
             <option value="$PROJECT_DIR$/feature/availability" />
             <option value="$PROJECT_DIR$/feature/bookingdetails" />
+            <option value="$PROJECT_DIR$/feature/houses" />
             <option value="$PROJECT_DIR$/feature/newbooking" />
             <option value="$PROJECT_DIR$/feature/timeline" />
           </set>

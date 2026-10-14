@@ -47,7 +47,8 @@ internal data class TimelineMonth(
 internal sealed interface TimelineRow {
     data class Group(val type: HouseType) : TimelineRow
 
-    data class House(val houseId: String, val name: String) : TimelineRow
+    /** [openIndex] is the first day guests can stay, when the house opens inside the window; days before it are closed. */
+    data class House(val houseId: String, val name: String, val openIndex: Int? = null) : TimelineRow
 }
 
 /** One house's share of an individual or group booking. */

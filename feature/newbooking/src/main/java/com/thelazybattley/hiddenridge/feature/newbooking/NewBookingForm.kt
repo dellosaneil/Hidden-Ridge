@@ -5,10 +5,12 @@ import com.thelazybattley.hiddenridge.core.domain.model.Booking
 import com.thelazybattley.hiddenridge.core.domain.model.BookingConflict
 import com.thelazybattley.hiddenridge.core.domain.model.BookingDraft
 import com.thelazybattley.hiddenridge.core.domain.model.BookingMode
+import com.thelazybattley.hiddenridge.core.domain.model.DraftProblem
 import com.thelazybattley.hiddenridge.core.domain.model.House
 import com.thelazybattley.hiddenridge.core.domain.model.HouseType
 import com.thelazybattley.hiddenridge.core.domain.model.StayRequest
 import com.thelazybattley.hiddenridge.core.domain.model.toDraft
+import com.thelazybattley.hiddenridge.core.domain.model.types
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -59,37 +61,36 @@ internal fun NewBookingForm.toUi(allAvailability: Availability): NewBookingFormU
     val request = draft.stayRequest()
     val housesById = availability.houses.associateBy(House::id)
     val selectedHouses = availability.houses.filter { it.id in draft.houseIds }
-    val activeType = houseTypeTab
+    val types = availability.houses.types()
+    val activeType = houseTypeTab?.takeIf { tab -> types.any { it.id == tab.id } }
         ?: selectedHouses.firstOrNull()?.type
-        ?: availability.houses.firstOrNull()?.type
-        ?: HouseType.CABIN
+        ?: types.firstOrNull()
+    val housesOf: (HouseType) -> List<House> = { type -> availability.houses.filter { it.type.id == type.id } }
 
     return NewBookingFormUi(
         purpose = purpose,
         draft = draft,
         editingDate = editingDate,
         calendar = calendar(availability),
-        houseTypes = HouseType.entries
-            .mapNotNull { type -> availability.houses.filter { it.type == type }.takeIf { it.isNotEmpty() }?.let { type to it } }
-            .map { (type, houses) ->
-                HouseTypeTileUi(
-                    type = type,
-                    sleeps = type.sleeps,
-                    freeCount = request?.let { houses.count { availability.isFree(it.id, request.checkIn, request.checkOut) } },
-                    selectedCount = houses.count { it.id in draft.houseIds },
-                    isActive = type == activeType,
-                )
-            },
-        houses = availability.houses.filter { it.type == activeType }.map { houseTile(it, availability, request) },
+        houseTypes = types.map { type ->
+            val houses = housesOf(type)
+            HouseTypeTileUi(
+                type = type,
+                sleeps = type.sleeps,
+                freeCount = request?.let { houses.count { availability.isFree(it.id, request.checkIn, request.checkOut) } },
+                selectedCount = houses.count { it.id in draft.houseIds },
+                isActive = type.id == activeType?.id,
+            )
+        },
+        houses = activeType?.let(housesOf).orEmpty().map { houseTile(it, availability, request) },
         selectedHouseNames = selectedHouses.map(House::name),
-        houseCountsByType = availability.houses.groupingBy(House::type).eachCount()
-            .map { (type, count) -> HouseTypeCount(type, count) }
-            .sortedBy { it.type.ordinal },
+        houseCountsByType = types.map { type -> HouseTypeCount(type, housesOf(type).size) },
         totalHouses = availability.houses.size,
         capacity = (if (draft.isWholeResort) availability.houses else selectedHouses).sumOf(House::sleeps),
         holdUntil = draft.holdUntil(availability.today),
         conflicts = request?.let(availability::conflictsFor).orEmpty().map { it.toUi(housesById) },
-        problems = draft.problems(availability.today, keptCheckIn = original?.checkIn),
+        problems = draft.problems(availability.today, keptCheckIn = original?.checkIn) +
+            listOfNotNull(DraftProblem.HOUSE_NOT_OPEN.takeIf { request != null && availability.closedFor(request).isNotEmpty() }),
         showProblems = showProblems,
         isSaving = isSaving,
     )
@@ -137,20 +138,23 @@ private fun NewBookingForm.houseTile(house: House, availability: Availability, r
     val conflict = request?.let {
         availability.conflictsFor(StayRequest(BookingMode.INDIVIDUAL, listOf(house.id), it.checkIn, it.checkOut)).firstOrNull()
     }
+    val opensOn = request?.let { house.bookableFrom?.takeUnless { house.isOpenOn(request.checkIn) } }
+    val unavailable = conflict != null || opensOn != null
     return HouseTileUi(
         houseId = house.id,
         name = house.name,
         shortLabel = house.shortLabel(),
         state = when {
             request == null -> if (selected) HouseTileState.SELECTED else HouseTileState.NEEDS_DATES
-            conflict != null && selected -> HouseTileState.SELECTED_BUT_TAKEN
-            conflict != null -> HouseTileState.TAKEN
+            unavailable && selected -> HouseTileState.SELECTED_BUT_TAKEN
+            unavailable -> HouseTileState.TAKEN
             selected -> HouseTileState.SELECTED
             else -> HouseTileState.FREE
         },
         takenBy = conflict?.booking?.let {
             TakenBy(guestName = it.guestName, isWholeResort = it.isWholeResort, checkIn = it.checkIn, checkOut = it.checkOut)
         },
+        opensOn = opensOn,
     )
 }
 

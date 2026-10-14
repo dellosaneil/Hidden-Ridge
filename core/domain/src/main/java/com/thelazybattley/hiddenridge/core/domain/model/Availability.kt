@@ -11,8 +11,17 @@ data class Availability(
 ) {
     fun conflictsFor(request: StayRequest): List<BookingConflict> = bookings.conflictsWith(request)
 
+    /** Open for the whole stay and not booked by anyone else. */
     fun isFree(houseId: String, checkIn: LocalDate, checkOut: LocalDate): Boolean =
-        conflictsFor(StayRequest(BookingMode.INDIVIDUAL, listOf(houseId), checkIn, checkOut)).isEmpty()
+        houses.firstOrNull { it.id == houseId }?.isOpenOn(checkIn) != false &&
+            conflictsFor(StayRequest(BookingMode.INDIVIDUAL, listOf(houseId), checkIn, checkOut)).isEmpty()
+
+    /**
+     * The requested houses that aren't bookable yet when the stay starts. A whole-resort stay
+     * takes whichever houses are open, so it's never stopped by one that isn't.
+     */
+    fun closedFor(request: StayRequest): List<House> =
+        if (request.isWholeResort) emptyList() else houses.filter { it.id in request.houseIds && !it.isOpenOn(request.checkIn) }
 
     /**
      * Nights in [from] until [until] that can't be booked for what's chosen so far: with no house
@@ -23,16 +32,22 @@ data class Availability(
         if (mode == BookingMode.INDIVIDUAL && houseIds.isEmpty()) {
             return nights.filter { night -> housesTakenOn(night) >= houses.size }.toSet()
         }
+        val chosen = if (mode == BookingMode.WHOLE_RESORT) emptyList() else houses.filter { it.id in houseIds }
         val relevant = if (mode == BookingMode.WHOLE_RESORT) {
             bookings
         } else {
             bookings.filter { it.isWholeResort || it.houseIds.any(houseIds::contains) }
         }
-        return nights.filter { night -> relevant.any { it.coversNight(night) } }.toSet()
+        return nights.filter { night -> relevant.any { it.coversNight(night) } || chosen.any { !it.isOpenOn(night) } }.toSet()
     }
 
-    private fun housesTakenOn(night: LocalDate): Int =
-        bookings.filter { it.coversNight(night) }.sumOf { if (it.isWholeResort) houses.size else it.houseIds.size }
+    /** Houses booked or not open yet on [night]. */
+    private fun housesTakenOn(night: LocalDate): Int {
+        val staying = bookings.filter { it.coversNight(night) }
+        if (staying.any(Booking::isWholeResort)) return houses.size
+        val booked = staying.flatMap(Booking::houseIds).toSet()
+        return houses.count { it.id in booked || !it.isOpenOn(night) }
+    }
 }
 
 /** A stay someone wants to book, checked against existing bookings before it exists. */

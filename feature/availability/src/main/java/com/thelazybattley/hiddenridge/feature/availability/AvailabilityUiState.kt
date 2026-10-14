@@ -84,7 +84,7 @@ internal sealed interface AvailabilityResultUi {
         val filter: HouseFilter,
         val rows: List<HouseRowUi>,
     ) : AvailabilityResultUi {
-        val freeRows: List<HouseRowUi> get() = rows.filter { it.takenBy == null }
+        val freeRows: List<HouseRowUi> get() = rows.filter(HouseRowUi::isFree)
         val fits: Boolean get() = freeRows.isNotEmpty()
     }
 
@@ -106,7 +106,11 @@ internal data class HouseRowUi(
     val name: String,
     val sleeps: Int,
     val takenBy: ConflictRowUi?,
-)
+    /** When the house first takes guests, if that's after check-in. */
+    val opensOn: LocalDate? = null,
+) {
+    val isFree: Boolean get() = takenBy == null && opensOn == null
+}
 
 /** An existing booking that holds some of the chosen nights. */
 @Immutable

@@ -20,6 +20,7 @@ import androidx.compose.material.icons.outlined.EventBusy
 import androidx.compose.material.icons.outlined.GroupAdd
 import androidx.compose.material.icons.outlined.HolidayVillage
 import androidx.compose.material.icons.outlined.HourglassEmpty
+import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Update
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -84,7 +85,7 @@ private fun SummaryCard(result: AvailabilityResultUi) {
         is AvailabilityResultUi.WholeResort ->
             stringResource(if (result.fits) R.string.result_resort_free else R.string.result_resort_taken)
         is AvailabilityResultUi.Houses -> if (result.fits) {
-            val kind = (result.filter as? HouseFilter.OfType)?.let { stringResource(it.type.plural) } ?: stringResource(R.string.result_houses)
+            val kind = (result.filter as? HouseFilter.OfType)?.type?.pluralName?.lowercase(currentLocale()) ?: stringResource(R.string.result_houses)
             stringResource(R.string.result_houses_free, result.freeRows.size, result.rows.size, kind)
         } else {
             stringResource(R.string.result_nothing_free)
@@ -182,6 +183,7 @@ private fun HouseResults(result: AvailabilityResultUi.Houses, onAction: (Availab
 private fun HouseRow(row: HouseRowUi, onAction: (AvailabilityAction) -> Unit) {
     val colors = MaterialTheme.colorScheme
     val takenBy = row.takenBy
+    val opensOn = row.opensOn
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -192,12 +194,13 @@ private fun HouseRow(row: HouseRowUi, onAction: (AvailabilityAction) -> Unit) {
     ) {
         Icon(
             imageVector = when {
+                opensOn != null -> Icons.Outlined.Schedule
                 takenBy == null -> Icons.Filled.CheckCircle
                 takenBy.isHold -> Icons.Outlined.HourglassEmpty
                 else -> Icons.Filled.Block
             },
             contentDescription = null,
-            tint = if (takenBy == null) colors.primary else colors.onSurfaceVariant,
+            tint = if (row.isFree) colors.primary else colors.onSurfaceVariant,
             modifier = Modifier.size(20.dp),
         )
         Column(modifier = Modifier.weight(1f)) {
@@ -205,26 +208,30 @@ private fun HouseRow(row: HouseRowUi, onAction: (AvailabilityAction) -> Unit) {
                 Text(
                     text = row.name,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = if (takenBy == null) colors.onSurface else colors.onSurfaceVariant,
+                    color = if (row.isFree) colors.onSurface else colors.onSurfaceVariant,
                 )
                 Text(stringResource(R.string.house_sleeps, row.sleeps), style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
             }
             Text(
-                text = if (takenBy == null) stringResource(R.string.house_free_all_nights) else takenByText(takenBy),
+                text = when {
+                    takenBy != null -> takenByText(takenBy)
+                    opensOn != null -> stringResource(R.string.house_opens_on, DateFormats.weekdayDayMonth(currentLocale()).format(opensOn))
+                    else -> stringResource(R.string.house_free_all_nights)
+                },
                 style = MaterialTheme.typography.bodySmall,
-                color = if (takenBy == null) colors.primary else colors.onSurfaceVariant,
+                color = if (row.isFree) colors.primary else colors.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
         }
-        if (takenBy == null) {
+        if (row.isFree) {
             val label = stringResource(R.string.action_book_house, row.name)
             FilledTonalButton(
                 onClick = { onAction(AvailabilityAction.Book(houseIds = listOf(row.houseId))) },
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 modifier = Modifier.semantics { contentDescription = label },
             ) { Text(stringResource(R.string.action_book)) }
-        } else {
+        } else if (takenBy != null) {
             val label = stringResource(R.string.action_view_booking, takenBy.guestName)
             TextButton(
                 onClick = { onAction(AvailabilityAction.ViewBooking(takenBy.bookingId)) },

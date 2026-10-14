@@ -187,7 +187,7 @@ private fun HousesReady(
                 items = houses.rows,
                 key = { row ->
                     when (row) {
-                        is HousesRow.Group -> "group:${row.type}"
+                        is HousesRow.Group -> "group:${row.type.id}"
                         is HousesRow.House -> row.house.houseId
                     }
                 },
@@ -200,7 +200,7 @@ private fun HousesReady(
                         todayIndex = houses.todayIndex,
                         showDivider = !row.isLastInGroup,
                         onBookingClick = onBookingClick,
-                        onFreeHouseClick = { onFreeHouseClick(row.house.houseId, houses.today) },
+                        onFreeHouseClick = { onFreeHouseClick(row.house.houseId, row.house.opensOn ?: houses.today) },
                         onActionClick = onActionClick,
                     )
                 }

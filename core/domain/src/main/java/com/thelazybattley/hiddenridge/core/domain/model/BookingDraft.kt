@@ -72,6 +72,9 @@ enum class DraftProblem {
     CHECK_IN_IN_PAST,
     MISSING_CHECK_OUT,
     NO_HOUSES,
+
+    /** A chosen house isn't bookable yet on check-in. */
+    HOUSE_NOT_OPEN,
     MISSING_GUEST_NAME,
     NO_GUESTS,
 }

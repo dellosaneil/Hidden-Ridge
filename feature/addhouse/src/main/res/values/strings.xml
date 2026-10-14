@@ -1,0 +1,59 @@
+<resources>
+    <string name="addhouse_title">Add house</string>
+    <string name="addhouse_action_discard">Discard and close</string>
+    <string name="addhouse_action_save">Save</string>
+
+    <string name="addhouse_section_type">Type</string>
+    <string name="addhouse_type_note">Sleeps %1$d · %2$d now</string>
+    <string name="addhouse_type_new">New type</string>
+    <string name="addhouse_type_new_note">Name your own</string>
+    <string name="addhouse_field_type_name">Type name</string>
+    <string name="addhouse_type_name_help">Becomes a new group, “%1$s”, on the timeline and Houses tab.</string>
+    <string name="addhouse_type_name_help_empty">Becomes a new group on the timeline and Houses tab.</string>
+    <string name="addhouse_field_icon">Icon</string>
+    <string name="addhouse_icon_tree">Tree</string>
+    <string name="addhouse_icon_cabin">Cabin</string>
+    <string name="addhouse_icon_cottage">Cottage</string>
+    <string name="addhouse_icon_tent">Tent</string>
+    <string name="addhouse_icon_villa">Villa</string>
+    <string name="addhouse_icon_village">Village</string>
+
+    <string name="addhouse_section_house">House</string>
+    <string name="addhouse_field_name">Name</string>
+    <string name="addhouse_name_placeholder">House name</string>
+    <string name="addhouse_name_help_suggested">Suggested from the other %1$s. Shown on the timeline and on bookings.</string>
+    <string name="addhouse_name_help_numbered">Numbered from the type name. Shown on the timeline and on bookings.</string>
+    <string name="addhouse_name_help">Shown on the timeline and on bookings.</string>
+    <string name="addhouse_field_bookable_from">Bookable from</string>
+    <string name="addhouse_bookable_from_help">Earlier dates show as closed.</string>
+    <string name="addhouse_change_bookable_from">Change the first bookable date</string>
+    <string name="addhouse_field_sleeps">Sleeps</string>
+    <string name="addhouse_sleeps_fewer">Sleeps fewer</string>
+    <string name="addhouse_sleeps_more">Sleeps more</string>
+    <string name="addhouse_field_note">Note (optional)</string>
+    <string name="addhouse_note_placeholder">e.g. Ground floor, step-free access</string>
+    <string name="addhouse_note_help">Staff see this when picking a house for a booking.</string>
+
+    <string name="addhouse_preview_title">Will appear as</string>
+    <string name="addhouse_preview_badge_new">New</string>
+    <string name="addhouse_preview_badge_new_type">New type</string>
+    <string name="addhouse_preview_detail">%1$s · sleeps %2$d · from %3$s</string>
+
+    <string name="addhouse_footer_houses">Hidden Ridge goes from %1$d to %2$d houses</string>
+    <string name="addhouse_footer_new_group">Adds the %1$s group · %2$d → %3$d houses</string>
+    <string name="addhouse_footer_new_group_unnamed">Adds a new group · %1$d → %2$d houses</string>
+    <string name="addhouse_action_add">Add %1$s</string>
+    <string name="addhouse_action_add_house">Add house</string>
+
+    <string name="addhouse_problem_missing_type_name">Name the new type.</string>
+    <string name="addhouse_problem_type_name_taken">There’s already a type with this name.</string>
+    <string name="addhouse_problem_missing_name">Give the house a name.</string>
+    <string name="addhouse_problem_name_taken">Another house already has this name.</string>
+    <string name="addhouse_problem_sleeps">A house sleeps 1 to 20.</string>
+
+    <string name="addhouse_date_picker_ok">OK</string>
+    <string name="addhouse_date_picker_cancel">Cancel</string>
+
+    <string name="addhouse_message_added">Added %1$s</string>
+    <string name="addhouse_message_added_with_group">Added %1$s · new %2$s group</string>
+</resources>

@@ -19,9 +19,6 @@
     <string name="houses_filter_occupied">Occupied</string>
     <string name="houses_filter_moving">Arriving / leaving</string>
 
-    <string name="houses_group_cabins">Cabins</string>
-    <string name="houses_group_casitas">Casitas</string>
-    <string name="houses_group_family_houses">Family houses</string>
     <string name="houses_sleeps">Sleeps %1$d</string>
 
     <string name="houses_status_occupied">Occupied</string>
@@ -37,6 +34,7 @@
     <string name="houses_summary_free_until">Free until %1$s · %2$s</string>
     <string name="houses_summary_free_hold">Free · %1$s hold from %2$s</string>
     <string name="houses_summary_free_all_week">Free all week</string>
+    <string name="houses_summary_opens_on">Opens %1$s</string>
     <plurals name="houses_nights">
         <item quantity="one">%1$d night</item>
         <item quantity="other">%1$d nights</item>

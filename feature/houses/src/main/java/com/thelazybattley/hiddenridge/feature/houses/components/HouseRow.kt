@@ -21,7 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Login
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.Bed
-import androidx.compose.material.icons.outlined.Cottage
 import androidx.compose.material.icons.outlined.HowToReg
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -52,7 +51,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.thelazybattley.hiddenridge.core.designsystem.component.dashedBorder
+import com.thelazybattley.hiddenridge.core.designsystem.component.imageVector
 import com.thelazybattley.hiddenridge.core.designsystem.format.currentLocale
+import com.thelazybattley.hiddenridge.core.designsystem.theme.HiddenRidgeTheme
 import com.thelazybattley.hiddenridge.core.domain.model.HouseType
 import com.thelazybattley.hiddenridge.feature.houses.HouseAction
 import com.thelazybattley.hiddenridge.feature.houses.HouseRowUi
@@ -104,7 +105,7 @@ internal fun GroupHeader(type: HouseType, modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = stringResource(type.groupLabel).uppercase(locale),
+            text = type.pluralName.uppercase(locale),
             fontSize = 11.sp,
             fontWeight = FontWeight.SemiBold,
             letterSpacing = 0.08.em,
@@ -137,7 +138,7 @@ internal fun HouseRow(
     modifier: Modifier = Modifier,
 ) {
     val colors = MaterialTheme.colorScheme
-    val style = house.status.style()
+    val style = house.status.style(freeIcon = house.icon.imageVector)
     val summary = summaryText(house.summary)
     val description = stringResource(R.string.houses_row_description, house.name, style.label, summary)
     val bookingId = house.bookingId
@@ -285,6 +286,9 @@ private fun NightCell(night: NightState, isToday: Boolean, size: Dp = NightSize)
         NightState.HOLD -> base
             .background(colors.surfaceContainerHighest, NightShape)
             .dashedBorder(width = 1.5.dp, color = colors.outline, cornerRadius = 4.dp, dashLength = 3.dp, gapLength = 2.dp)
+        NightState.CLOSED -> base
+            .background(HiddenRidgeTheme.extendedColors.past, NightShape)
+            .then(if (isToday) Modifier.border(2.dp, colors.primary, NightShape) else Modifier)
         NightState.FREE -> base.border(
             if (isToday) 2.dp else 1.dp,
             if (isToday) colors.primary else colors.outlineVariant,
@@ -335,7 +339,7 @@ private class StatusStyle(
 )
 
 @Composable
-private fun HouseStatus.style(): StatusStyle {
+private fun HouseStatus.style(freeIcon: ImageVector): StatusStyle {
     val colors = MaterialTheme.colorScheme
     return when (this) {
         HouseStatus.OCCUPIED -> StatusStyle(
@@ -358,7 +362,7 @@ private fun HouseStatus.style(): StatusStyle {
         )
         HouseStatus.FREE -> StatusStyle(
             label = stringResource(R.string.houses_status_free),
-            icon = Icons.Outlined.Cottage,
+            icon = freeIcon,
             tile = Color.Transparent, onTile = colors.onSurfaceVariant, tileBorder = colors.outlineVariant,
             pill = Color.Transparent, onPill = colors.primary, pillBorder = colors.primary,
         )
@@ -392,12 +396,6 @@ private fun summaryText(summary: HouseSummary): String {
             }
         }
         HouseSummary.FreeAllWeek -> stringResource(R.string.houses_summary_free_all_week)
+        is HouseSummary.OpensOn -> stringResource(R.string.houses_summary_opens_on, HousesFormat.weekdayDayMonth(locale).format(summary.date))
     }
 }
-
-private val HouseType.groupLabel: Int
-    get() = when (this) {
-        HouseType.CABIN -> R.string.houses_group_cabins
-        HouseType.CASITA -> R.string.houses_group_casitas
-        HouseType.FAMILY_HOUSE -> R.string.houses_group_family_houses
-    }

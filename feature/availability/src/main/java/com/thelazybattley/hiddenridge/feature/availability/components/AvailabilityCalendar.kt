@@ -48,7 +48,6 @@ import com.thelazybattley.hiddenridge.core.designsystem.component.rememberResort
 import com.thelazybattley.hiddenridge.core.designsystem.format.DateFormats
 import com.thelazybattley.hiddenridge.core.designsystem.format.currentLocale
 import com.thelazybattley.hiddenridge.core.domain.model.HouseFilter
-import com.thelazybattley.hiddenridge.core.domain.model.HouseType
 import com.thelazybattley.hiddenridge.feature.availability.AvailabilityCalendarUi
 import com.thelazybattley.hiddenridge.feature.availability.AvailabilityDayUi
 import com.thelazybattley.hiddenridge.feature.availability.DaySelection
@@ -102,7 +101,7 @@ internal fun AvailabilityCalendar(
             if (filter != HouseFilter.WholeResort) {
                 Text(
                     text = when (filter) {
-                        is HouseFilter.OfType -> stringResource(R.string.calendar_note_type, stringResource(filter.type.plural))
+                        is HouseFilter.OfType -> stringResource(R.string.calendar_note_type, filter.type.pluralName.lowercase(currentLocale()))
                         else -> stringResource(R.string.calendar_note_houses)
                     },
                     style = MaterialTheme.typography.labelSmall,
@@ -306,11 +305,3 @@ private fun LegendItem(@StringRes label: Int, swatch: Modifier) {
         Text(stringResource(label), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
-
-@get:StringRes
-internal val HouseType.plural: Int
-    get() = when (this) {
-        HouseType.CABIN -> R.string.type_cabins
-        HouseType.CASITA -> R.string.type_casitas
-        HouseType.FAMILY_HOUSE -> R.string.type_family_houses
-    }

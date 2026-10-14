@@ -37,6 +37,8 @@ data class NightOccupancy(
     /** Every house when [wholeResortBooking] is set. */
     val takenHouseIds: Set<String>,
     val wholeResortBooking: Booking?,
+    /** Houses that aren't bookable yet on this night. */
+    val closedHouseIds: Set<String> = emptySet(),
 )
 
 fun Availability.occupancyOn(night: LocalDate): NightOccupancy {
@@ -45,5 +47,6 @@ fun Availability.occupancyOn(night: LocalDate): NightOccupancy {
     return NightOccupancy(
         takenHouseIds = if (wholeResort != null) houses.map(House::id).toSet() else staying.flatMap(Booking::houseIds).toSet(),
         wholeResortBooking = wholeResort,
+        closedHouseIds = houses.filterNot { it.isOpenOn(night) }.map(House::id).toSet(),
     )
 }

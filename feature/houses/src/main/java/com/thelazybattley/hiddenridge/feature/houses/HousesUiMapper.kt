@@ -3,9 +3,9 @@ package com.thelazybattley.hiddenridge.feature.houses
 import com.thelazybattley.hiddenridge.core.domain.model.Booking
 import com.thelazybattley.hiddenridge.core.domain.model.HouseDay
 import com.thelazybattley.hiddenridge.core.domain.model.HouseRoster
-import com.thelazybattley.hiddenridge.core.domain.model.HouseType
 import com.thelazybattley.hiddenridge.core.domain.model.StayPhase
 import com.thelazybattley.hiddenridge.core.domain.model.stayPhaseOn
+import com.thelazybattley.hiddenridge.core.domain.model.types
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
@@ -27,8 +27,8 @@ internal fun HouseRoster.toUi(filter: HousesFilter, firstDayOfWeek: DayOfWeek): 
         week = week,
         filter = filter,
         filterCounts = HousesFilter.entries.associateWith { f -> all.count { it.second.status in f.statuses } },
-        rows = HouseType.entries.flatMap { type ->
-            val shown = all.filter { (day, row) -> day.house.type == type && row.status in filter.statuses }
+        rows = houses.map(HouseDay::house).types().flatMap { type ->
+            val shown = all.filter { (day, row) -> day.house.type.id == type.id && row.status in filter.statuses }
             if (shown.isEmpty()) {
                 emptyList()
             } else {
@@ -69,17 +69,20 @@ private fun HouseDay.toRow(today: LocalDate, week: List<LocalDate>, weekEnd: Loc
         }
         departing != null && departing.checkedOut -> HouseStatus.FREE to HouseSummary.CheckedOut(departing.guestName)
         departing != null -> HouseStatus.LEAVING to HouseSummary.Leaving(departing.guestName)
+        !house.isOpenOn(today) -> HouseStatus.FREE to HouseSummary.OpensOn(checkNotNull(house.bookableFrom))
         else -> HouseStatus.FREE to freeSummary(weekEnd)
     }
     val bookingHouses: (Booking) -> Int = { if (it.isWholeResort) houseCount else it.houseIds.size }
     return HouseRowUi(
         houseId = house.id,
         name = house.name,
+        icon = house.type.icon,
         status = status,
         summary = summary,
         nights = week.map { night ->
             val stay = stayOn(night)
             when {
+                stay == null && !house.isOpenOn(night) -> NightState.CLOSED
                 stay == null -> NightState.FREE
                 stay.isOnHold -> NightState.HOLD
                 else -> NightState.BOOKED
@@ -91,6 +94,7 @@ private fun HouseDay.toRow(today: LocalDate, week: List<LocalDate>, weekEnd: Loc
             HouseStatus.LEAVING -> departing?.let { HouseAction.CheckOut(it.id, it.guestName, house.name, bookingHouses(it)) }
             else -> null
         },
+        opensOn = house.bookableFrom?.takeUnless { house.isOpenOn(today) },
     )
 }
 

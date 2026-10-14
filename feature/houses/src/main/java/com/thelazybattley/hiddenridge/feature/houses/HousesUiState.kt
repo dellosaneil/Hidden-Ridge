@@ -1,6 +1,7 @@
 package com.thelazybattley.hiddenridge.feature.houses
 
 import androidx.compose.runtime.Immutable
+import com.thelazybattley.hiddenridge.core.domain.model.HouseIcon
 import com.thelazybattley.hiddenridge.core.domain.model.HouseType
 import java.time.LocalDate
 
@@ -65,12 +66,17 @@ internal enum class NightState {
     FREE,
     BOOKED,
     HOLD,
+
+    /** Before the house opens to guests. */
+    CLOSED,
 }
 
 @Immutable
 internal data class HouseRowUi(
     val houseId: String,
     val name: String,
+    /** Its type's picture, shown while the house is free. */
+    val icon: HouseIcon,
     val status: HouseStatus,
     val summary: HouseSummary,
     /** One entry per night of [HousesUi.week]. */
@@ -79,6 +85,8 @@ internal data class HouseRowUi(
     val bookingId: String?,
     /** Shown under the row while someone is due in or out today. */
     val action: HouseAction?,
+    /** The first night guests can stay, while that's after today. */
+    val opensOn: LocalDate? = null,
 )
 
 /** Today's arrival or departure for one house, which staff mark when it happens. */
@@ -129,4 +137,7 @@ internal sealed interface HouseSummary {
     data class FreeUntil(val until: LocalDate, val guestName: String, val isHold: Boolean) : HouseSummary
 
     data object FreeAllWeek : HouseSummary
+
+    /** Not taking guests until [date]. */
+    data class OpensOn(val date: LocalDate) : HouseSummary
 }

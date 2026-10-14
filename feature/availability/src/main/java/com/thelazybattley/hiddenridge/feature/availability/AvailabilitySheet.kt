@@ -42,7 +42,6 @@ import com.thelazybattley.hiddenridge.core.designsystem.component.TallDestinatio
 import com.thelazybattley.hiddenridge.core.designsystem.format.DateFormats
 import com.thelazybattley.hiddenridge.core.designsystem.format.currentLocale
 import com.thelazybattley.hiddenridge.core.domain.model.HouseFilter
-import com.thelazybattley.hiddenridge.core.domain.model.HouseType
 import com.thelazybattley.hiddenridge.feature.availability.components.AvailabilityCalendar
 import com.thelazybattley.hiddenridge.feature.availability.components.AvailabilityResults
 import java.time.LocalDate
@@ -176,13 +175,7 @@ private fun FilterRow(selected: HouseFilter, filters: List<HouseFilter>, onSelec
 private fun filterLabel(filter: HouseFilter): String = when (filter) {
     HouseFilter.AnyHouse -> stringResource(R.string.filter_any_house)
     HouseFilter.WholeResort -> stringResource(R.string.filter_whole_resort)
-    is HouseFilter.OfType -> stringResource(
-        when (filter.type) {
-            HouseType.CABIN -> R.string.filter_cabins
-            HouseType.CASITA -> R.string.filter_casitas
-            HouseType.FAMILY_HOUSE -> R.string.filter_family
-        },
-    )
+    is HouseFilter.OfType -> filter.type.pluralName
 }
 
 /** Read-only: dates are picked on the calendar. The field the next tap fills is highlighted. */

@@ -5,11 +5,11 @@ import com.thelazybattley.hiddenridge.core.domain.model.Booking
 import com.thelazybattley.hiddenridge.core.domain.model.BookingMode
 import com.thelazybattley.hiddenridge.core.domain.model.House
 import com.thelazybattley.hiddenridge.core.domain.model.HouseFilter
-import com.thelazybattley.hiddenridge.core.domain.model.HouseType
 import com.thelazybattley.hiddenridge.core.domain.model.StayRequest
 import com.thelazybattley.hiddenridge.core.domain.model.housesFor
 import com.thelazybattley.hiddenridge.core.domain.model.nextOpening
 import com.thelazybattley.hiddenridge.core.domain.model.occupancyOn
+import com.thelazybattley.hiddenridge.core.domain.model.types
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.temporal.ChronoUnit
@@ -44,7 +44,7 @@ internal data class AvailabilityForm(
 internal fun AvailabilityForm.toUi(availability: Availability): AvailabilityUi = AvailabilityUi(
     filter = filter,
     filters = listOf(HouseFilter.AnyHouse) +
-        HouseType.entries.filter { type -> availability.houses.any { it.type == type } }.map(HouseFilter::OfType) +
+        availability.houses.types().map(HouseFilter::OfType) +
         HouseFilter.WholeResort,
     checkIn = checkIn,
     checkOut = checkOut,
@@ -70,7 +70,7 @@ private fun AvailabilityForm.calendar(availability: Availability): AvailabilityC
             val free = if (wholeResort) {
                 if (occupancy.takenHouseIds.isEmpty()) 1 else 0
             } else {
-                houses.count { it.id !in occupancy.takenHouseIds }
+                houses.count { it.id !in occupancy.takenHouseIds && it.id !in occupancy.closedHouseIds }
             }
             val resortBooking = occupancy.wholeResortBooking
             val isPast = date.isBefore(availability.today)
@@ -119,13 +119,19 @@ private fun AvailabilityForm.result(availability: Availability, checkIn: LocalDa
 
     val rows = availability.housesFor(filter).map { house ->
         val conflict = availability.conflictsFor(StayRequest(BookingMode.INDIVIDUAL, listOf(house.id), checkIn, checkOut)).firstOrNull()
-        HouseRowUi(houseId = house.id, name = house.name, sleeps = house.sleeps, takenBy = conflict?.booking?.toRow(housesById))
+        HouseRowUi(
+            houseId = house.id,
+            name = house.name,
+            sleeps = house.sleeps,
+            takenBy = conflict?.booking?.toRow(housesById),
+            opensOn = house.bookableFrom?.takeUnless { house.isOpenOn(checkIn) },
+        )
     }
     return AvailabilityResultUi.Houses(
         checkIn = checkIn,
         checkOut = checkOut,
         nights = nights,
-        nextOpening = if (rows.any { it.takenBy == null }) null else nextOpening,
+        nextOpening = if (rows.any(HouseRowUi::isFree)) null else nextOpening,
         filter = filter,
         rows = rows,
     )

@@ -224,7 +224,7 @@ private fun HouseColumn(rows: List<TimelineRow>, modifier: Modifier = Modifier) 
                 ) {
                     // Group labels run on over the grid's matching group band rather than truncating.
                     Text(
-                        text = stringResource(row.type.groupLabel).uppercase(currentLocale()),
+                        text = row.type.pluralName.uppercase(currentLocale()),
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontWeight = FontWeight.SemiBold,
                             letterSpacing = 0.08.em,
@@ -288,8 +288,10 @@ private fun TimelineBody(
                 detectTapGestures { offset ->
                     val dayIndex = (offset.x / dayWidth.toPx()).toInt()
                     val row = rowLayout.rowAt(offset.y.toDp()) as? TimelineRow.House ?: return@detectTapGestures
-                    // Past nights can't be booked.
-                    if (dayIndex >= timeline.todayIndex) currentOnEmptyDayClick(row.houseId, timeline.dateAt(dayIndex))
+                    // Past nights, and nights before a house opens, can't be booked.
+                    if (dayIndex >= maxOf(timeline.todayIndex, row.openIndex ?: 0)) {
+                        currentOnEmptyDayClick(row.houseId, timeline.dateAt(dayIndex))
+                    }
                 }
             },
     ) {
@@ -353,8 +355,14 @@ private fun DrawScope.drawGrid(
         when (row) {
             is TimelineRow.Group ->
                 drawRect(colors.surfaceContainer, topLeft = Offset(left, top), size = Size(right - left, height))
-            is TimelineRow.House ->
+            is TimelineRow.House -> {
+                // Nights before the house opens are closed, shaded like the past.
+                val closedEnd = (row.openIndex ?: 0) * dayPx
+                if (closedEnd > left) {
+                    drawRect(extendedColors.past, topLeft = Offset(left, top), size = Size(minOf(closedEnd, right) - left, height))
+                }
                 drawRect(colors.outlineVariant, topLeft = Offset(left, top + height - hairline), size = Size(right - left, hairline))
+            }
         }
     }
     timeline.months.forEach { month ->

@@ -8,10 +8,11 @@ import com.thelazybattley.hiddenridge.core.database.dao.HouseDao
 import com.thelazybattley.hiddenridge.core.database.entity.BookingEntity
 import com.thelazybattley.hiddenridge.core.database.entity.BookingHouseCrossRef
 import com.thelazybattley.hiddenridge.core.database.entity.HouseEntity
+import com.thelazybattley.hiddenridge.core.database.entity.HouseTypeEntity
 
 @Database(
-    entities = [HouseEntity::class, BookingEntity::class, BookingHouseCrossRef::class],
-    version = 2,
+    entities = [HouseTypeEntity::class, HouseEntity::class, BookingEntity::class, BookingHouseCrossRef::class],
+    version = 3,
     exportSchema = false,
 )
 @TypeConverters(DateConverters::class)

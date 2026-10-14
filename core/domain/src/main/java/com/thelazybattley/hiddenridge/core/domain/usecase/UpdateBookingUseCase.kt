@@ -7,6 +7,7 @@ import com.thelazybattley.hiddenridge.core.domain.model.DateWindow
 import com.thelazybattley.hiddenridge.core.domain.model.DraftProblem
 import com.thelazybattley.hiddenridge.core.domain.model.conflictsWith
 import com.thelazybattley.hiddenridge.core.domain.repository.BookingRepository
+import com.thelazybattley.hiddenridge.core.domain.repository.HouseRepository
 import com.thelazybattley.hiddenridge.core.domain.time.DateProvider
 import javax.inject.Inject
 import kotlinx.coroutines.flow.first
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.first
  */
 class UpdateBookingUseCase @Inject constructor(
     private val bookingRepository: BookingRepository,
+    private val houseRepository: HouseRepository,
     private val dateProvider: DateProvider,
 ) {
     sealed interface Result {
@@ -33,6 +35,10 @@ class UpdateBookingUseCase @Inject constructor(
         if (problems.isNotEmpty()) return Result.Invalid(problems)
 
         val request = checkNotNull(draft.stayRequest()) { "A draft without problems has dates" }
+        val houses = houseRepository.observeHouses().first()
+        if (!request.isWholeResort && houses.any { it.id in request.houseIds && !it.isOpenOn(request.checkIn) }) {
+            return Result.Invalid(listOf(DraftProblem.HOUSE_NOT_OPEN))
+        }
         // Check again against the stored bookings: the form's copy may be a moment out of date.
         val conflicts = bookingRepository
             .observeActiveBookings(DateWindow(request.checkIn, request.checkOut))

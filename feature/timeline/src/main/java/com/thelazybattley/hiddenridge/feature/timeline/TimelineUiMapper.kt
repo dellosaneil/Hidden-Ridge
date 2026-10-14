@@ -3,13 +3,13 @@ package com.thelazybattley.hiddenridge.feature.timeline
 import com.thelazybattley.hiddenridge.core.domain.model.Booking
 import com.thelazybattley.hiddenridge.core.domain.model.DateWindow
 import com.thelazybattley.hiddenridge.core.domain.model.House
-import com.thelazybattley.hiddenridge.core.domain.model.HouseType
 import com.thelazybattley.hiddenridge.core.domain.model.Timeline
+import com.thelazybattley.hiddenridge.core.domain.model.types
 import java.time.YearMonth
 import java.time.temporal.ChronoUnit
 
 internal fun Timeline.toUi(): TimelineUi {
-    val rows = houseRows(houses)
+    val rows = houseRows(houses, window)
     val bookingsByMode = bookings.partition(Booking::isWholeResort)
     return TimelineUi(
         today = today,
@@ -24,15 +24,17 @@ internal fun Timeline.toUi(): TimelineUi {
     )
 }
 
-/** Houses grouped under a header per type, types in their natural order. */
-private fun houseRows(houses: List<House>): List<TimelineRow> =
-    HouseType.entries.flatMap { type ->
-        val ofType = houses.filter { it.type == type }
-        if (ofType.isEmpty()) {
-            emptyList()
-        } else {
-            listOf(TimelineRow.Group(type)) + ofType.map { TimelineRow.House(houseId = it.id, name = it.name) }
-        }
+/** Houses grouped under a header per type, types in the order their first house is listed. */
+private fun houseRows(houses: List<House>, window: DateWindow): List<TimelineRow> =
+    houses.types().flatMap { type ->
+        listOf(TimelineRow.Group(type)) +
+            houses.filter { it.type.id == type.id }.map { house ->
+                TimelineRow.House(
+                    houseId = house.id,
+                    name = house.name,
+                    openIndex = house.bookableFrom?.let(window::indexOf)?.takeIf { it > 0 },
+                )
+            }
     }
 
 private fun DateWindow.months(): List<TimelineMonth> =

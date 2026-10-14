@@ -166,6 +166,7 @@ private val DraftProblem.message: Int
         DraftProblem.CHECK_IN_IN_PAST -> R.string.problem_check_in_in_past
         DraftProblem.MISSING_CHECK_OUT -> R.string.problem_missing_check_out
         DraftProblem.NO_HOUSES -> R.string.problem_no_houses
+        DraftProblem.HOUSE_NOT_OPEN -> R.string.problem_house_not_open
         DraftProblem.MISSING_GUEST_NAME -> R.string.problem_missing_guest_name
         DraftProblem.NO_GUESTS -> R.string.problem_no_guests
     }

@@ -1,6 +1,5 @@
 package com.thelazybattley.hiddenridge.feature.newbooking.components
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -38,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.thelazybattley.hiddenridge.core.designsystem.format.DateFormats
 import com.thelazybattley.hiddenridge.core.designsystem.format.currentLocale
-import com.thelazybattley.hiddenridge.core.domain.model.HouseType
 import com.thelazybattley.hiddenridge.feature.newbooking.HouseTileState
 import com.thelazybattley.hiddenridge.feature.newbooking.HouseTileUi
 import com.thelazybattley.hiddenridge.feature.newbooking.HouseTypeCount
@@ -125,7 +123,7 @@ private fun HouseTypeTile(tile: HouseTypeTileUi, onClick: () -> Unit, modifier: 
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = stringResource(tile.type.shortLabel),
+                    text = tile.type.pluralName,
                     style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier.weight(1f),
                     maxLines = 1,
@@ -228,6 +226,7 @@ private fun houseStatus(house: HouseTileUi): String {
             if (takenBy.isWholeResort) stringResource(R.string.house_status_whole_resort) else takenBy.guestName,
             DateFormats.stayRange(takenBy.checkIn, takenBy.checkOut, currentLocale()),
         )
+        house.opensOn != null -> stringResource(R.string.house_status_opens, DateFormats.weekdayDayMonth(currentLocale()).format(house.opensOn))
         house.state == HouseTileState.NEEDS_DATES -> stringResource(R.string.house_status_pick_dates)
         house.state == HouseTileState.SELECTED -> stringResource(R.string.house_status_selected)
         else -> stringResource(R.string.house_status_free)
@@ -236,7 +235,8 @@ private fun houseStatus(house: HouseTileUi): String {
 
 @Composable
 private fun WholeResortCard(totalHouses: Int, counts: List<HouseTypeCount>) {
-    val countsText = counts.map { pluralStringResource(it.type.countLabel, it.count, it.count) }.joinToString()
+    val locale = currentLocale()
+    val countsText = counts.joinToString { "${it.count} ${(if (it.count == 1) it.type.name else it.type.pluralName).lowercase(locale)}" }
     Surface(
         shape = TileShape,
         color = MaterialTheme.colorScheme.tertiaryContainer,
@@ -258,18 +258,3 @@ private fun WholeResortCard(totalHouses: Int, counts: List<HouseTypeCount>) {
         }
     }
 }
-
-@get:StringRes
-private val HouseType.shortLabel: Int
-    get() = when (this) {
-        HouseType.CABIN -> R.string.house_type_cabins
-        HouseType.CASITA -> R.string.house_type_casitas
-        HouseType.FAMILY_HOUSE -> R.string.house_type_family
-    }
-
-private val HouseType.countLabel: Int
-    get() = when (this) {
-        HouseType.CABIN -> R.plurals.count_cabins
-        HouseType.CASITA -> R.plurals.count_casitas
-        HouseType.FAMILY_HOUSE -> R.plurals.count_family_houses
-    }

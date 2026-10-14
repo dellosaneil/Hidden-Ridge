@@ -97,7 +97,11 @@ private fun MonthTitle(houseCount: Int, monthTitle: String, onClick: () -> Unit)
     ) {
         Column(Modifier.weight(1f, fill = false)) {
             Text(
-                text = pluralStringResource(R.plurals.timeline_property_label, houseCount, houseCount),
+                text = if (houseCount == 0) {
+                    stringResource(R.string.timeline_property_label_empty)
+                } else {
+                    pluralStringResource(R.plurals.timeline_property_label, houseCount, houseCount)
+                },
                 style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,

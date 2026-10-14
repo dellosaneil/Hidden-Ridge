@@ -14,6 +14,7 @@ fun NavGraphBuilder.timelineScreen(
     onEmptyDayClick: (houseId: String, date: LocalDate) -> Unit,
     onNewBookingClick: () -> Unit,
     onCheckAvailabilityClick: () -> Unit,
+    onAddHouseClick: () -> Unit,
 ) {
     composable<TimelineRoute> {
         TimelineScreen(
@@ -21,6 +22,7 @@ fun NavGraphBuilder.timelineScreen(
             onEmptyDayClick = onEmptyDayClick,
             onNewBookingClick = onNewBookingClick,
             onCheckAvailabilityClick = onCheckAvailabilityClick,
+            onAddHouseClick = onAddHouseClick,
         )
     }
 }

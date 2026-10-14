@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.thelazybattley.hiddenridge.core.designsystem.theme.HiddenRidgeTheme
+import com.thelazybattley.hiddenridge.feature.timeline.components.EmptyTimeline
 import com.thelazybattley.hiddenridge.feature.timeline.components.GoToMonthDialog
 import com.thelazybattley.hiddenridge.feature.timeline.components.MonthRail
 import com.thelazybattley.hiddenridge.feature.timeline.components.TimelineDimens
@@ -47,6 +48,7 @@ internal fun TimelineScreen(
     onEmptyDayClick: (houseId: String, date: LocalDate) -> Unit,
     onNewBookingClick: () -> Unit,
     onCheckAvailabilityClick: () -> Unit,
+    onAddHouseClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TimelineViewModel = hiltViewModel(),
 ) {
@@ -57,6 +59,7 @@ internal fun TimelineScreen(
         onEmptyDayClick = onEmptyDayClick,
         onNewBookingClick = onNewBookingClick,
         onCheckAvailabilityClick = onCheckAvailabilityClick,
+        onAddHouseClick = onAddHouseClick,
         modifier = modifier,
     )
 }
@@ -68,6 +71,7 @@ internal fun TimelineScreenContent(
     onEmptyDayClick: (houseId: String, date: LocalDate) -> Unit,
     onNewBookingClick: () -> Unit,
     onCheckAvailabilityClick: () -> Unit,
+    onAddHouseClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -83,6 +87,7 @@ internal fun TimelineScreenContent(
                 onEmptyDayClick = onEmptyDayClick,
                 onNewBookingClick = onNewBookingClick,
                 onCheckAvailabilityClick = onCheckAvailabilityClick,
+                onAddHouseClick = onAddHouseClick,
             )
         }
     }
@@ -95,6 +100,7 @@ private fun TimelineReady(
     onEmptyDayClick: (houseId: String, date: LocalDate) -> Unit,
     onNewBookingClick: () -> Unit,
     onCheckAvailabilityClick: () -> Unit,
+    onAddHouseClick: () -> Unit,
 ) {
     val dayPx = with(LocalDensity.current) { TimelineDimens.DayWidth.toPx() }
     val horizontalScroll = rememberScrollState(initial = scrollOffsetFor(timeline.todayIndex - DAYS_BEFORE_TODAY, dayPx))
@@ -140,15 +146,24 @@ private fun TimelineReady(
         )
         TimelineLegend()
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-        TimelineGrid(
-            timeline = timeline,
-            horizontalScroll = horizontalScroll,
-            onBookingClick = onBookingClick,
-            onEmptyDayClick = onEmptyDayClick,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-        )
+        if (timeline.houseCount == 0) {
+            EmptyTimeline(
+                onAddHouseClick = onAddHouseClick,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+            )
+        } else {
+            TimelineGrid(
+                timeline = timeline,
+                horizontalScroll = horizontalScroll,
+                onBookingClick = onBookingClick,
+                onEmptyDayClick = onEmptyDayClick,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+            )
+        }
     }
 }
 
@@ -166,6 +181,7 @@ private fun TimelineScreenPreview() {
             onEmptyDayClick = { _, _ -> },
             onNewBookingClick = {},
             onCheckAvailabilityClick = {},
+            onAddHouseClick = {},
         )
     }
 }
