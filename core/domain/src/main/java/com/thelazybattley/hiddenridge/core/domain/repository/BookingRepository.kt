@@ -10,6 +10,9 @@ interface BookingRepository {
     /** Confirmed and held bookings with at least one night inside [window], ordered by check-in. */
     fun observeActiveBookings(window: DateWindow): Flow<List<Booking>>
 
+    /** Every booking in any status, including cancelled and finished ones, ordered by check-in. */
+    fun observeAllBookings(): Flow<List<Booking>>
+
     /** The booking with [bookingId] in any status, or null once it no longer exists. */
     fun observeBooking(bookingId: String): Flow<Booking?>
 

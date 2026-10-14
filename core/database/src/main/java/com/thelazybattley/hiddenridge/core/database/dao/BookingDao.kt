@@ -28,6 +28,10 @@ interface BookingDao {
     fun observeActiveBetween(from: LocalDate, to: LocalDate): Flow<List<BookingWithHouses>>
 
     @Transaction
+    @Query("SELECT * FROM bookings ORDER BY check_in")
+    fun observeAll(): Flow<List<BookingWithHouses>>
+
+    @Transaction
     @Query("SELECT * FROM bookings WHERE id = :id")
     fun observeById(id: String): Flow<BookingWithHouses?>
 

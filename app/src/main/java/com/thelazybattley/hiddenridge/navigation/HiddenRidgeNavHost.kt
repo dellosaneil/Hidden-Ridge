@@ -13,6 +13,7 @@ import com.thelazybattley.hiddenridge.feature.availability.navigation.availabili
 import com.thelazybattley.hiddenridge.feature.availability.navigation.closeAvailability
 import com.thelazybattley.hiddenridge.feature.availability.navigation.navigateToAvailability
 import com.thelazybattley.hiddenridge.feature.bookingdetails.navigation.bookingDetailsSheet
+import com.thelazybattley.hiddenridge.feature.bookings.navigation.bookingsScreen
 import com.thelazybattley.hiddenridge.feature.bookingdetails.navigation.closeBookingDetails
 import com.thelazybattley.hiddenridge.feature.bookingdetails.navigation.navigateToBookingDetails
 import com.thelazybattley.hiddenridge.feature.houses.navigation.housesScreen
@@ -44,6 +45,11 @@ fun HiddenRidgeNavHost(
             onNewBookingClick = { navController.navigateToNewBooking() },
             onCheckAvailabilityClick = { navController.navigateToAvailability() },
             onAddHouseClick = navController::navigateToAddHouse,
+        )
+        bookingsScreen(
+            onBookingClick = navController::navigateToBookingDetails,
+            onNewBookingClick = { navController.navigateToNewBooking() },
+            onSearchClick = { onShowMessage(notBuiltYetMessage) },
         )
         housesScreen(
             onBookingClick = navController::navigateToBookingDetails,

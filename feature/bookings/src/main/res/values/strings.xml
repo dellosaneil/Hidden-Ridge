@@ -1,0 +1,44 @@
+<resources>
+    <string name="bookings_title">Bookings</string>
+    <string name="bookings_property_label">Hidden Ridge · today, %1$s</string>
+    <string name="bookings_search">Search guests and bookings</string>
+    <string name="bookings_new">New</string>
+
+    <string name="bookings_tab_upcoming">Upcoming</string>
+    <string name="bookings_tab_past">Past</string>
+    <string name="bookings_tab_description">%1$s, %2$d bookings</string>
+
+    <string name="bookings_filter_all">All</string>
+    <string name="bookings_filter_confirmed">Confirmed</string>
+    <string name="bookings_filter_hold">On hold</string>
+    <string name="bookings_filter_whole_resort">Whole resort</string>
+
+    <string name="bookings_group_today">Today · %1$s</string>
+    <string name="bookings_group_this_week">This week</string>
+    <string name="bookings_group_earlier_in">Earlier in %1$s</string>
+    <plurals name="bookings_group_count">
+        <item quantity="one">%1$d booking</item>
+        <item quantity="other">%1$d bookings</item>
+    </plurals>
+
+    <string name="bookings_status_arriving">Arriving</string>
+    <string name="bookings_status_leaving">Leaving</string>
+    <string name="bookings_status_in_house">In-house</string>
+    <string name="bookings_status_checked_out">Checked out</string>
+    <string name="bookings_status_cancelled">Cancelled</string>
+    <string name="bookings_status_on_hold">On hold</string>
+    <string name="bookings_status_whole_resort">Whole resort</string>
+    <string name="bookings_status_confirmed">Confirmed</string>
+
+    <string name="bookings_whole_resort_houses">Whole resort · %1$d houses</string>
+    <plurals name="bookings_nights">
+        <item quantity="one">%1$d night</item>
+        <item quantity="other">%1$d nights</item>
+    </plurals>
+    <string name="bookings_row_detail">%1$s · %2$s · %3$s</string>
+    <string name="bookings_row_detail_hold_until">%1$s · %2$s · %3$s · until %4$s</string>
+    <string name="bookings_row_description">%1$s, %2$s, %3$s</string>
+    <string name="bookings_view">View booking</string>
+
+    <string name="bookings_empty">No bookings match this filter.</string>
+</resources>

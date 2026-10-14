@@ -22,6 +22,9 @@ internal class OfflineBookingRepository @Inject constructor(
         bookingDao.observeActiveBetween(from = window.start, to = window.endExclusive)
             .map { bookings -> bookings.map(BookingWithHouses::toDomain) }
 
+    override fun observeAllBookings(): Flow<List<Booking>> =
+        bookingDao.observeAll().map { bookings -> bookings.map(BookingWithHouses::toDomain) }
+
     override fun observeBooking(bookingId: String): Flow<Booking?> =
         bookingDao.observeById(bookingId).map { it?.toDomain() }
 
