@@ -1,0 +1,85 @@
+<resources>
+    <string name="overview_title">Overview</string>
+    <string name="overview_property_label">Hidden Ridge · %1$s</string>
+
+    <string name="overview_tile_occupied">Occupied tonight</string>
+    <string name="overview_tile_occupied_unit">of %1$d</string>
+    <plurals name="overview_tile_free">
+        <item quantity="one">%1$d house free</item>
+        <item quantity="other">%1$d houses free</item>
+    </plurals>
+    <string name="overview_tile_arriving">Arriving today</string>
+    <string name="overview_tile_leaving">Leaving today</string>
+    <plurals name="overview_unit_guests">
+        <item quantity="one">guest</item>
+        <item quantity="other">guests</item>
+    </plurals>
+    <string name="overview_tile_movement">%1$s · %2$s</string>
+    <string name="overview_tile_more">%1$s + %2$d more</string>
+    <string name="overview_no_arrivals">No arrivals</string>
+    <string name="overview_no_departures">No departures</string>
+    <string name="overview_tile_holds">On hold</string>
+    <plurals name="overview_unit_bookings">
+        <item quantity="one">booking</item>
+        <item quantity="other">bookings</item>
+    </plurals>
+    <string name="overview_holds_soon">%1$d releases soon</string>
+    <string name="overview_holds_no_limit">%1$d no limit</string>
+    <string name="overview_holds_later">%1$d later</string>
+    <string name="overview_holds_none">Nothing waiting</string>
+    <string name="overview_tile_description">%1$s: %2$s %3$s. %4$s</string>
+
+    <string name="overview_moves_title">Today’s movements</string>
+    <string name="overview_moves_houses">Houses</string>
+    <string name="overview_moves_arriving">Arriving · %1$s · %2$s</string>
+    <string name="overview_moves_leaving">Leaving · %1$s</string>
+    <string name="overview_moves_none">Everyone due today is checked in or out.</string>
+    <string name="overview_check_in">Check in</string>
+    <string name="overview_check_out">Check out</string>
+    <string name="overview_check_in_description">Check in %1$s</string>
+    <string name="overview_check_out_description">Check out %1$s</string>
+    <string name="overview_whole_resort">Whole resort</string>
+    <string name="overview_whole_resort_houses">Whole resort · %1$d houses</string>
+    <plurals name="overview_nights">
+        <item quantity="one">%1$d night</item>
+        <item quantity="other">%1$d nights</item>
+    </plurals>
+
+    <string name="overview_week_title">Houses booked, next 7 nights</string>
+    <string name="overview_week_of">of %1$d</string>
+    <string name="overview_week_tonight">Tonight</string>
+    <string name="overview_week_today">Today</string>
+    <string name="overview_week_readout">%1$s: %2$d booked · %3$d free</string>
+    <string name="overview_week_readout_held">%1$s: %2$d booked · %3$d on hold · %4$d free</string>
+    <string name="overview_week_night_description">%1$s: %2$d of %3$d houses booked</string>
+    <string name="overview_week_night_description_held">%1$s: %2$d of %3$d houses booked, %4$d on hold</string>
+    <string name="overview_legend_booked">Booked</string>
+    <string name="overview_legend_hold">On hold</string>
+
+    <string name="overview_decisions_title">Needs a decision</string>
+    <string name="overview_decisions_none">No holds waiting on you.</string>
+    <string name="overview_decision_releases">%1$s’s hold releases %2$s</string>
+    <string name="overview_decision_arrives_today">%1$s arrives today</string>
+    <string name="overview_decision_arrives_tomorrow">%1$s arrives tomorrow</string>
+    <string name="overview_decision_arrives_in">%1$s arrives in %2$d days</string>
+    <string name="overview_decision_in_house">%1$s is in-house, still on hold</string>
+    <string name="overview_decision_detail">%1$s · %2$s · %3$s</string>
+    <string name="overview_decision_no_limit">On hold · no limit</string>
+    <string name="overview_decision_until">On hold · until %1$s</string>
+    <string name="overview_release">Release</string>
+    <string name="overview_confirm">Confirm</string>
+    <string name="overview_release_description">Release %1$s hold</string>
+    <string name="overview_confirm_description">Confirm %1$s booking</string>
+
+    <string name="overview_months_title">Nights booked by month</string>
+    <string name="overview_month_description">%1$s, %2$d%% booked</string>
+    <string name="overview_percent">%1$d%%</string>
+    <string name="overview_resort_booked">Whole resort booked %1$s · %2$s</string>
+    <string name="overview_resort_held">Whole resort on hold %1$s · %2$s</string>
+
+    <string name="overview_checked_in">%1$s checked in</string>
+    <string name="overview_checked_out">%1$s checked out</string>
+    <string name="overview_confirmed">Confirmed %1$s’s booking</string>
+    <string name="overview_released">Released %1$s’s hold</string>
+    <string name="overview_undo">Undo</string>
+</resources>

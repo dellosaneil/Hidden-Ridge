@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
 private val FieldShape = RoundedCornerShape(4.dp)
@@ -62,22 +63,31 @@ fun LabeledBox(
     }
 }
 
-/** A filter chip that shows a check while selected, as the design's option chips do. */
+/**
+ * A filter chip that shows a check while selected, as the design's option chips do.
+ *
+ * @param icon shown before the label while unselected, such as ∞ for a hold with no limit.
+ */
 @Composable
 fun OptionChip(
     label: String,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
 ) {
     FilterChip(
         selected = selected,
         onClick = onClick,
         label = { Text(label, maxLines = 1) },
-        leadingIcon = if (selected) {
-            { Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(16.dp)) }
-        } else {
-            null
+        leadingIcon = when {
+            selected -> {
+                { Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(16.dp)) }
+            }
+            icon != null -> {
+                { Icon(icon, contentDescription = null, modifier = Modifier.size(16.dp)) }
+            }
+            else -> null
         },
         modifier = modifier,
     )

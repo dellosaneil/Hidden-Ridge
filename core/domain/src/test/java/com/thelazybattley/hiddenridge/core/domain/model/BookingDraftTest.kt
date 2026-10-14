@@ -47,6 +47,25 @@ class BookingDraftTest {
         assertEquals(today.plusDays(4), draft.holdUntil(today))
     }
 
+    @Test
+    fun `a hold with no limit has no release date`() {
+        val draft = BookingDraft(checkIn = today.plusDays(10), checkOut = today.plusDays(12), status = BookingStatus.HOLD, holdDays = null)
+
+        assertEquals(null, draft.holdUntil(today))
+        assertEquals(today.plusDays(3), draft.copy(holdDays = 3).holdUntil(today))
+    }
+
+    @Test
+    fun `editing a hold keeps its release date or its lack of one`() {
+        val stay = booking(today.plusDays(10), today.plusDays(12))
+        val timed = stay.copy(status = BookingStatus.HOLD, holdUntil = today.plusDays(2))
+        val open = stay.copy(status = BookingStatus.HOLD, holdUntil = null)
+
+        assertEquals(2, timed.toDraft(today).holdDays)
+        assertEquals(null, open.toDraft(today).holdDays)
+        assertEquals(HoldRelease.DEFAULT_DAYS, stay.toDraft(today).holdDays)
+    }
+
     private fun booking(checkIn: LocalDate, checkOut: LocalDate) = Booking(
         id = "b1",
         guestName = "Kim yoga group",

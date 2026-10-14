@@ -70,7 +70,10 @@
     <string name="hold_1_day">1 day</string>
     <string name="hold_3_days">3 days</string>
     <string name="hold_1_week">1 week</string>
+    <string name="hold_no_limit">No limit</string>
     <string name="hold_releases_on">Releases on %1$s unless you confirm it.</string>
+    <string name="hold_no_limit_decide">confirm or release it</string>
+    <string name="hold_no_limit_explainer">Stays on hold until you %1$s. It’s listed under “Needs a decision” on Overview so it isn’t forgotten.</string>
     <string name="field_note">Note for staff</string>
 
     <string name="footer_choose">Choose dates, then houses.</string>

@@ -33,6 +33,15 @@ fun rememberResortHoldHatchBrush(): Brush {
     }
 }
 
+/** Thin [stripe] lines over transparent, for anything on hold in a chart; draw over the surface. */
+@Composable
+fun rememberHoldHatchBrush(stripe: Color): Brush {
+    val density = LocalDensity.current
+    return remember(stripe, density) {
+        with(density) { diagonalStripes(stripe, Color.Transparent, stripeWidth = 2.dp.toPx(), period = 6.dp.toPx()) }
+    }
+}
+
 /** Repeating 45° stripes: [stripeWidth] of [stripe] then [gap] for the rest of each [period], in px. */
 private fun diagonalStripes(stripe: Color, gap: Color, stripeWidth: Float, period: Float): Brush {
     val step = period / sqrt(2f)

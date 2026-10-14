@@ -18,12 +18,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.thelazybattley.hiddenridge.R
 import com.thelazybattley.hiddenridge.navigation.HiddenRidgeNavHost
 import com.thelazybattley.hiddenridge.navigation.TopLevelDestination
+import com.thelazybattley.hiddenridge.navigation.navigateToTopLevel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -55,11 +55,7 @@ fun HiddenRidgeApp(modifier: Modifier = Modifier) {
                             if (route == null) {
                                 showNotBuiltYet()
                             } else if (!selected) {
-                                navController.navigate(route) {
-                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
+                                navController.navigateToTopLevel(route)
                             }
                         },
                         icon = {

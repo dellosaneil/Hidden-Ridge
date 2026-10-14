@@ -3,6 +3,7 @@ package com.thelazybattley.hiddenridge.feature.newbooking.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AllInclusive
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.CheckCircle
@@ -48,7 +50,9 @@ import com.thelazybattley.hiddenridge.feature.newbooking.NewBookingAction
 import com.thelazybattley.hiddenridge.feature.newbooking.NewBookingFormUi
 import com.thelazybattley.hiddenridge.feature.newbooking.R
 
-private val HoldOptions = listOf(1 to R.string.hold_1_day, 3 to R.string.hold_3_days, 7 to R.string.hold_1_week)
+/** Days before release, and null for a hold with no limit. */
+private val HoldOptions: List<Pair<Int?, Int>> =
+    listOf(1 to R.string.hold_1_day, 3 to R.string.hold_3_days, 7 to R.string.hold_1_week, null to R.string.hold_no_limit)
 
 @Composable
 internal fun GuestSection(
@@ -153,6 +157,20 @@ private fun CapacityNote(form: NewBookingFormUi) {
     }
 }
 
+/** [sentence] with its [bold] part set semibold, as the design highlights the key phrase. */
+@Composable
+private fun BoldedSentence(sentence: String, bold: String) {
+    Text(
+        text = buildAnnotatedString {
+            val start = sentence.indexOf(bold).coerceAtLeast(0)
+            append(sentence.substring(0, start))
+            withStyle(SpanStyle(fontWeight = FontWeight.SemiBold)) { append(sentence.substring(start, start + bold.length)) }
+            append(sentence.substring(start + bold.length))
+        },
+        style = MaterialTheme.typography.bodyMedium,
+    )
+}
+
 @Composable
 private fun HoldOptions(form: NewBookingFormUi, onAction: (NewBookingAction) -> Unit) {
     val colors = MaterialTheme.colorScheme
@@ -177,27 +195,26 @@ private fun HoldOptions(form: NewBookingFormUi, onAction: (NewBookingAction) -> 
                 style = MaterialTheme.typography.labelMedium,
                 color = colors.onSurfaceVariant,
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 HoldOptions.forEach { (days, label) ->
                     OptionChip(
                         label = stringResource(label),
                         selected = form.draft.holdDays == days,
                         onClick = { onAction(NewBookingAction.SetHoldDays(days)) },
+                        icon = if (days == null) Icons.Filled.AllInclusive else null,
                     )
                 }
             }
-            form.holdUntil?.let { releaseDate ->
-                val date = DateFormats.weekdayDayMonth(currentLocale()).format(releaseDate)
-                val sentence = stringResource(R.string.hold_releases_on, date)
-                Text(
-                    text = buildAnnotatedString {
-                        val start = sentence.indexOf(date)
-                        append(sentence.substring(0, start))
-                        withStyle(SpanStyle(fontWeight = FontWeight.SemiBold)) { append(date) }
-                        append(sentence.substring(start + date.length))
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
-                )
+            val releaseDate = form.holdUntil
+            when {
+                releaseDate != null -> {
+                    val date = DateFormats.weekdayDayMonth(currentLocale()).format(releaseDate)
+                    BoldedSentence(sentence = stringResource(R.string.hold_releases_on, date), bold = date)
+                }
+                form.draft.holdDays == null -> {
+                    val decide = stringResource(R.string.hold_no_limit_decide)
+                    BoldedSentence(sentence = stringResource(R.string.hold_no_limit_explainer, decide), bold = decide)
+                }
             }
         }
     }

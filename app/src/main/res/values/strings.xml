@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Hidden Ridge</string>
+    <string name="nav_overview">Overview</string>
     <string name="nav_timeline">Timeline</string>
     <string name="nav_bookings">Bookings</string>
     <string name="nav_houses">Houses</string>

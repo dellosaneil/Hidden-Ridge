@@ -47,7 +47,8 @@ internal sealed interface NewBookingAction {
     data object AddGuest : NewBookingAction
     data object RemoveGuest : NewBookingAction
     data class SetStatus(val status: BookingStatus) : NewBookingAction
-    data class SetHoldDays(val days: Int) : NewBookingAction
+    /** Null days keeps the hold until staff confirm or release it. */
+    data class SetHoldDays(val days: Int?) : NewBookingAction
     data class SetNote(val note: String) : NewBookingAction
     data object Save : NewBookingAction
 }

@@ -14,7 +14,7 @@ enum class BookingMode {
 enum class BookingStatus {
     CONFIRMED,
 
-    /** Reserved for the guest but not confirmed yet; released after [Booking.holdUntil]. */
+    /** Reserved for the guest but not confirmed yet; released after [Booking.holdUntil], or kept until staff decide when it has none. */
     HOLD,
 
     /** Kept for history only; no longer occupies any house. */

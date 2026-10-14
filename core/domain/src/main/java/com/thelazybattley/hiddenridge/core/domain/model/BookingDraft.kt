@@ -13,7 +13,8 @@ data class BookingDraft(
     val phone: String = "",
     val guestCount: Int = DEFAULT_GUEST_COUNT,
     val status: BookingStatus = BookingStatus.CONFIRMED,
-    val holdDays: Int = HoldRelease.DEFAULT_DAYS,
+    /** Days a hold lasts before it's released; null keeps it until staff confirm or release it. */
+    val holdDays: Int? = HoldRelease.DEFAULT_DAYS,
     val note: String = "",
 ) {
     val hasDates: Boolean get() = checkIn != null && checkOut != null && checkOut.isAfter(checkIn)
@@ -28,8 +29,10 @@ data class BookingDraft(
     fun stayRequest(): StayRequest? =
         if (hasDates) StayRequest(mode, if (isWholeResort) emptyList() else houseIds, checkIn!!, checkOut!!) else null
 
-    fun holdUntil(today: LocalDate): LocalDate? =
-        if (isHold) checkIn?.let { HoldRelease.date(today, it, holdDays) } else null
+    fun holdUntil(today: LocalDate): LocalDate? {
+        val days = holdDays ?: return null
+        return if (isHold) checkIn?.let { HoldRelease.date(today, it, days) } else null
+    }
 
     /**
      * What still stops this draft from being saved, in the order the form asks for it.
@@ -53,7 +56,7 @@ data class BookingDraft(
     }
 }
 
-/** This booking as a draft to edit; a hold keeps its release date, as days from [today]. */
+/** This booking as a draft to edit; a hold keeps its release date as days from [today], or stays open-ended. */
 fun Booking.toDraft(today: LocalDate): BookingDraft = BookingDraft(
     mode = mode,
     houseIds = houseIds,
@@ -63,7 +66,11 @@ fun Booking.toDraft(today: LocalDate): BookingDraft = BookingDraft(
     phone = phone,
     guestCount = guestCount,
     status = if (isOnHold) BookingStatus.HOLD else BookingStatus.CONFIRMED,
-    holdDays = holdUntil?.let { ChronoUnit.DAYS.between(today, it).toInt().coerceAtLeast(0) } ?: HoldRelease.DEFAULT_DAYS,
+    holdDays = when {
+        holdUntil != null -> ChronoUnit.DAYS.between(today, holdUntil).toInt().coerceAtLeast(0)
+        isOnHold -> null
+        else -> HoldRelease.DEFAULT_DAYS
+    },
     note = note,
 )
 

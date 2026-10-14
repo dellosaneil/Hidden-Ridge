@@ -16,12 +16,15 @@ import com.thelazybattley.hiddenridge.feature.bookingdetails.navigation.bookingD
 import com.thelazybattley.hiddenridge.feature.bookings.navigation.bookingsScreen
 import com.thelazybattley.hiddenridge.feature.bookingdetails.navigation.closeBookingDetails
 import com.thelazybattley.hiddenridge.feature.bookingdetails.navigation.navigateToBookingDetails
+import com.thelazybattley.hiddenridge.feature.bookings.navigation.BookingsRoute
+import com.thelazybattley.hiddenridge.feature.houses.navigation.HousesRoute
 import com.thelazybattley.hiddenridge.feature.houses.navigation.housesScreen
 import com.thelazybattley.hiddenridge.feature.newbooking.navigation.closeNewBooking
 import com.thelazybattley.hiddenridge.feature.newbooking.navigation.navigateToEditBooking
 import com.thelazybattley.hiddenridge.feature.newbooking.navigation.navigateToNewBooking
 import com.thelazybattley.hiddenridge.feature.newbooking.navigation.newBookingSheet
-import com.thelazybattley.hiddenridge.feature.timeline.navigation.TimelineRoute
+import com.thelazybattley.hiddenridge.feature.overview.navigation.OverviewRoute
+import com.thelazybattley.hiddenridge.feature.overview.navigation.overviewScreen
 import com.thelazybattley.hiddenridge.feature.timeline.navigation.timelineScreen
 
 /**
@@ -36,9 +39,13 @@ fun HiddenRidgeNavHost(
     val notBuiltYetMessage = stringResource(R.string.not_built_yet)
     NavHost(
         navController = navController,
-        startDestination = TimelineRoute,
+        startDestination = OverviewRoute,
         modifier = modifier,
     ) {
+        overviewScreen(
+            onOpenHouses = { navController.navigateToTopLevel(HousesRoute) },
+            onOpenBookings = { navController.navigateToTopLevel(BookingsRoute) },
+        )
         timelineScreen(
             onBookingClick = navController::navigateToBookingDetails,
             onEmptyDayClick = { houseId, date -> navController.navigateToNewBooking(houseIds = listOf(houseId), checkIn = date) },
