@@ -23,6 +23,8 @@ data class BookingEntity(
     @ColumnInfo(name = "guest_count") val guestCount: Int,
     val phone: String,
     val note: String,
+    @ColumnInfo(name = "checked_in", defaultValue = "0") val checkedIn: Boolean = false,
+    @ColumnInfo(name = "checked_out", defaultValue = "0") val checkedOut: Boolean = false,
 ) {
     companion object {
         /** Must match `BookingStatus.CANCELLED.name`; used inside queries, so it has to be a constant. */

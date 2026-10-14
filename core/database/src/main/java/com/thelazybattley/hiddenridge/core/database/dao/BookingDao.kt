@@ -34,6 +34,12 @@ interface BookingDao {
     @Query("UPDATE bookings SET status = :status, hold_until = :holdUntil WHERE id = :id")
     suspend fun updateStatus(id: String, status: String, holdUntil: LocalDate?)
 
+    @Query("UPDATE bookings SET checked_in = :checkedIn WHERE id = :id")
+    suspend fun updateCheckedIn(id: String, checkedIn: Boolean)
+
+    @Query("UPDATE bookings SET checked_out = :checkedOut WHERE id = :id")
+    suspend fun updateCheckedOut(id: String, checkedOut: Boolean)
+
     /** Also removes the booking's house links, through the foreign key cascade. */
     @Query("DELETE FROM bookings WHERE id = :id")
     suspend fun deleteById(id: String)

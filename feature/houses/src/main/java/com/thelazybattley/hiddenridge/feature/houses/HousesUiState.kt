@@ -77,16 +77,53 @@ internal data class HouseRowUi(
     val nights: List<NightState>,
     /** The stay a tap opens: tonight's, else this morning's departure. Null when the house is free. */
     val bookingId: String?,
+    /** Shown under the row while someone is due in or out today. */
+    val action: HouseAction?,
 )
+
+/** Today's arrival or departure for one house, which staff mark when it happens. */
+@Immutable
+internal sealed interface HouseAction {
+    val bookingId: String
+    val guestName: String
+    val houseName: String
+
+    /** How many houses the booking covers, so the confirmation can say more than [houseName]. */
+    val houseCount: Int
+
+    data class CheckIn(
+        override val bookingId: String,
+        override val guestName: String,
+        override val houseName: String,
+        override val houseCount: Int,
+    ) : HouseAction
+
+    data class CheckOut(
+        override val bookingId: String,
+        override val guestName: String,
+        override val houseName: String,
+        override val houseCount: Int,
+    ) : HouseAction
+}
 
 /** The line under a house's name. */
 @Immutable
 internal sealed interface HouseSummary {
-    data class InHouse(val guestName: String, val night: Int, val nights: Int, val checkOut: LocalDate) : HouseSummary
+    data class InHouse(
+        val guestName: String,
+        val night: Int,
+        val nights: Int,
+        val checkOut: LocalDate,
+        /** Checked in today, so the line confirms it. */
+        val justCheckedIn: Boolean = false,
+    ) : HouseSummary
 
     data class Arriving(val guestName: String, val nights: Int) : HouseSummary
 
     data class Leaving(val guestName: String) : HouseSummary
+
+    /** [guestName] left this morning and has been checked out. */
+    data class CheckedOut(val guestName: String) : HouseSummary
 
     /** Free tonight; [guestName] arrives on [until], within the week shown. */
     data class FreeUntil(val until: LocalDate, val guestName: String, val isHold: Boolean) : HouseSummary

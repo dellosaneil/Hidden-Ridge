@@ -35,6 +35,10 @@ data class Booking(
     val guestCount: Int,
     val phone: String,
     val note: String,
+    /** Staff marked the guest arrived; until then a stay starting today shows as arriving. */
+    val checkedIn: Boolean = false,
+    /** Staff marked the guest gone; the house is free from this morning. */
+    val checkedOut: Boolean = false,
 ) {
     init {
         require(checkOut.isAfter(checkIn)) { "Check-out ($checkOut) must be after check-in ($checkIn)" }

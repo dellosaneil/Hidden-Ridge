@@ -40,4 +40,12 @@ internal class OfflineBookingRepository @Inject constructor(
     override suspend fun deleteBooking(bookingId: String) {
         bookingDao.deleteById(bookingId)
     }
+
+    override suspend fun setCheckedIn(bookingId: String, checkedIn: Boolean) {
+        bookingDao.updateCheckedIn(id = bookingId, checkedIn = checkedIn)
+    }
+
+    override suspend fun setCheckedOut(bookingId: String, checkedOut: Boolean) {
+        bookingDao.updateCheckedOut(id = bookingId, checkedOut = checkedOut)
+    }
 }

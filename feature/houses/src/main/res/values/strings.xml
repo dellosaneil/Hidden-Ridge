@@ -32,6 +32,8 @@
     <string name="houses_summary_in_house">%1$s · night %2$d of %3$d · out %4$s</string>
     <string name="houses_summary_arriving">%1$s arrives today · %2$s</string>
     <string name="houses_summary_leaving">%1$s leaves today · then free</string>
+    <string name="houses_summary_checked_in">%1$s · checked in · night %2$d of %3$d · out %4$s</string>
+    <string name="houses_summary_checked_out">%1$s checked out · free tonight</string>
     <string name="houses_summary_free_until">Free until %1$s · %2$s</string>
     <string name="houses_summary_free_hold">Free · %1$s hold from %2$s</string>
     <string name="houses_summary_free_all_week">Free all week</string>
@@ -42,6 +44,20 @@
     <string name="houses_row_description">%1$s, %2$s. %3$s</string>
     <string name="houses_view_booking">View booking</string>
     <string name="houses_new_booking">New booking</string>
+
+    <string name="houses_check_in">Check in</string>
+    <string name="houses_check_out">Check out</string>
+    <string name="houses_check_in_description">Check in %1$s, %2$s</string>
+    <string name="houses_check_out_description">Check out %1$s, %2$s</string>
+    <string name="houses_check_in_note">Marks %1$s occupied</string>
+    <string name="houses_check_in_note_group">Marks all %1$d of their houses occupied</string>
+    <string name="houses_check_out_note">Frees %1$s for tonight</string>
+    <string name="houses_check_out_note_group">Frees all %1$d of their houses for tonight</string>
+    <string name="houses_checked_in_message">%1$s checked in · %2$s is occupied</string>
+    <string name="houses_checked_in_message_group">%1$s checked in · %2$d houses are occupied</string>
+    <string name="houses_checked_out_message">%1$s checked out · %2$s is free</string>
+    <string name="houses_checked_out_message_group">%1$s checked out · %2$d houses are free</string>
+    <string name="houses_undo">Undo</string>
 
     <string name="houses_empty">No houses match this filter today.</string>
     <string name="houses_legend_booked">Booked</string>

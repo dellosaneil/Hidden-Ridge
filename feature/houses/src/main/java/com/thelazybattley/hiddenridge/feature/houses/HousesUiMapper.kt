@@ -16,13 +16,13 @@ internal fun HouseRoster.toUi(filter: HousesFilter, firstDayOfWeek: DayOfWeek): 
     val weekStart = today.with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
     val week = (0 until DAYS_PER_WEEK).map { weekStart.plusDays(it) }
     val weekEnd = weekStart.plusDays(DAYS_PER_WEEK)
-    val all = houses.map { it to it.toRow(today, week, weekEnd) }
+    val all = houses.map { it to it.toRow(today, week, weekEnd, houseCount = houses.size) }
     return HousesUi(
         today = today,
         houseCount = houses.size,
         occupiedTonight = houses.count { it.tonight != null },
-        arrivingToday = houses.count { it.tonight?.checkIn == today },
-        leavingToday = houses.count { it.departing != null },
+        arrivingToday = all.count { it.second.status == HouseStatus.ARRIVING },
+        leavingToday = all.count { it.second.status == HouseStatus.LEAVING },
         holds = houses.flatMap(HouseDay::stays).filter { it.isOnHold && it.overlaps(weekStart, weekEnd) }.distinctBy(Booking::id).size,
         week = week,
         filter = filter,
@@ -47,18 +47,31 @@ private val HousesFilter.statuses: Set<HouseStatus>
         HousesFilter.MOVING -> setOf(HouseStatus.ARRIVING, HouseStatus.LEAVING)
     }
 
-private fun HouseDay.toRow(today: LocalDate, week: List<LocalDate>, weekEnd: LocalDate): HouseRowUi {
+private fun HouseDay.toRow(today: LocalDate, week: List<LocalDate>, weekEnd: LocalDate, houseCount: Int): HouseRowUi {
     val tonight = tonight
     val departing = departing
     val (status, summary) = when {
         tonight != null -> when (val phase = tonight.stayPhaseOn(today)) {
             is StayPhase.InHouse -> HouseStatus.OCCUPIED to
                 HouseSummary.InHouse(tonight.guestName, phase.night, phase.nights, tonight.checkOut)
-            else -> HouseStatus.ARRIVING to HouseSummary.Arriving(tonight.guestName, tonight.nights)
+            else -> if (tonight.checkedIn) {
+                HouseStatus.OCCUPIED to
+                    HouseSummary.InHouse(
+                        guestName = tonight.guestName,
+                        night = 1,
+                        nights = tonight.nights,
+                        checkOut = tonight.checkOut,
+                        justCheckedIn = true,
+                    )
+            } else {
+                HouseStatus.ARRIVING to HouseSummary.Arriving(tonight.guestName, tonight.nights)
+            }
         }
+        departing != null && departing.checkedOut -> HouseStatus.FREE to HouseSummary.CheckedOut(departing.guestName)
         departing != null -> HouseStatus.LEAVING to HouseSummary.Leaving(departing.guestName)
         else -> HouseStatus.FREE to freeSummary(weekEnd)
     }
+    val bookingHouses: (Booking) -> Int = { if (it.isWholeResort) houseCount else it.houseIds.size }
     return HouseRowUi(
         houseId = house.id,
         name = house.name,
@@ -72,7 +85,12 @@ private fun HouseDay.toRow(today: LocalDate, week: List<LocalDate>, weekEnd: Loc
                 else -> NightState.BOOKED
             }
         },
-        bookingId = (tonight ?: departing)?.id,
+        bookingId = tonight?.id ?: departing?.takeUnless(Booking::checkedOut)?.id,
+        action = when (status) {
+            HouseStatus.ARRIVING -> tonight?.let { HouseAction.CheckIn(it.id, it.guestName, house.name, bookingHouses(it)) }
+            HouseStatus.LEAVING -> departing?.let { HouseAction.CheckOut(it.id, it.guestName, house.name, bookingHouses(it)) }
+            else -> null
+        },
     )
 }
 

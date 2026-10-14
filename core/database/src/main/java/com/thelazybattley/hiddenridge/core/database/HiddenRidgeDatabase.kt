@@ -11,7 +11,7 @@ import com.thelazybattley.hiddenridge.core.database.entity.HouseEntity
 
 @Database(
     entities = [HouseEntity::class, BookingEntity::class, BookingHouseCrossRef::class],
-    version = 1,
+    version = 2,
     exportSchema = false,
 )
 @TypeConverters(DateConverters::class)

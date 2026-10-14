@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,6 +22,10 @@ import androidx.compose.material.icons.automirrored.outlined.Login
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.Bed
 import androidx.compose.material.icons.outlined.Cottage
+import androidx.compose.material.icons.outlined.HowToReg
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -49,6 +54,7 @@ import androidx.compose.ui.unit.sp
 import com.thelazybattley.hiddenridge.core.designsystem.component.dashedBorder
 import com.thelazybattley.hiddenridge.core.designsystem.format.currentLocale
 import com.thelazybattley.hiddenridge.core.domain.model.HouseType
+import com.thelazybattley.hiddenridge.feature.houses.HouseAction
 import com.thelazybattley.hiddenridge.feature.houses.HouseRowUi
 import com.thelazybattley.hiddenridge.feature.houses.HouseStatus
 import com.thelazybattley.hiddenridge.feature.houses.HouseSummary
@@ -117,7 +123,8 @@ internal fun GroupHeader(type: HouseType, modifier: Modifier = Modifier) {
 
 /**
  * One house: its status tonight, a line on who is in it or next, and a strip of the week's nights.
- * Taps open tonight's or this morning's booking; a free house opens a new booking instead.
+ * Taps open tonight's or this morning's booking; a free house opens a new booking instead. A guest
+ * due in or out today gets a button to check them in or out.
  */
 @Composable
 internal fun HouseRow(
@@ -126,6 +133,7 @@ internal fun HouseRow(
     showDivider: Boolean,
     onBookingClick: (bookingId: String) -> Unit,
     onFreeHouseClick: () -> Unit,
+    onActionClick: (HouseAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = MaterialTheme.colorScheme
@@ -177,8 +185,67 @@ internal fun HouseRow(
             }
             WeekStrip(nights = house.nights, todayIndex = todayIndex)
         }
+        house.action?.let { action -> ActionRow(action = action, onClick = { onActionClick(action) }) }
         if (showDivider) HorizontalDivider(color = colors.outlineVariant)
     }
+}
+
+/** Lines up under the house name, past the 40dp tile and its 14dp gap. */
+@Composable
+private fun ActionRow(action: HouseAction, onClick: () -> Unit) {
+    val description: String
+    val note: String
+    when (action) {
+        is HouseAction.CheckIn -> {
+            description = stringResource(R.string.houses_check_in_description, action.guestName, action.houseName)
+            note = if (action.houseCount > 1) {
+                stringResource(R.string.houses_check_in_note_group, action.houseCount)
+            } else {
+                stringResource(R.string.houses_check_in_note, action.houseName)
+            }
+        }
+        is HouseAction.CheckOut -> {
+            description = stringResource(R.string.houses_check_out_description, action.guestName, action.houseName)
+            note = if (action.houseCount > 1) {
+                stringResource(R.string.houses_check_out_note_group, action.houseCount)
+            } else {
+                stringResource(R.string.houses_check_out_note, action.houseName)
+            }
+        }
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 70.dp, end = 16.dp, bottom = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        val buttonModifier = Modifier
+            .height(40.dp)
+            .semantics { contentDescription = description }
+        val padding = PaddingValues(start = 12.dp, end = 16.dp)
+        when (action) {
+            is HouseAction.CheckIn -> Button(onClick = onClick, contentPadding = padding, modifier = buttonModifier) {
+                ActionLabel(Icons.Outlined.HowToReg, stringResource(R.string.houses_check_in))
+            }
+            is HouseAction.CheckOut -> FilledTonalButton(onClick = onClick, contentPadding = padding, modifier = buttonModifier) {
+                ActionLabel(Icons.AutoMirrored.Outlined.Logout, stringResource(R.string.houses_check_out))
+            }
+        }
+        Text(
+            text = note,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+@Composable
+private fun ActionLabel(icon: ImageVector, label: String) {
+    Icon(icon, contentDescription = null, modifier = Modifier.size(ButtonDefaults.IconSize))
+    Text(label, modifier = Modifier.padding(start = 6.dp))
 }
 
 @Composable
@@ -303,7 +370,7 @@ private fun summaryText(summary: HouseSummary): String {
     val locale = currentLocale()
     return when (summary) {
         is HouseSummary.InHouse -> stringResource(
-            R.string.houses_summary_in_house,
+            if (summary.justCheckedIn) R.string.houses_summary_checked_in else R.string.houses_summary_in_house,
             summary.guestName,
             summary.night,
             summary.nights,
@@ -315,6 +382,7 @@ private fun summaryText(summary: HouseSummary): String {
             pluralStringResource(R.plurals.houses_nights, summary.nights, summary.nights),
         )
         is HouseSummary.Leaving -> stringResource(R.string.houses_summary_leaving, summary.guestName)
+        is HouseSummary.CheckedOut -> stringResource(R.string.houses_summary_checked_out, summary.guestName)
         is HouseSummary.FreeUntil -> {
             val day = HousesFormat.weekdayDay(locale).format(summary.until)
             if (summary.isHold) {

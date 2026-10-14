@@ -107,6 +107,53 @@ class HousesUiMapperTest {
     }
 
     @Test
+    fun `arrivals get a check in and departures a check out`() {
+        val ui = ui(
+            stay("arriving", listOf("c2"), from = 0, to = 3),
+            stay("out", listOf("ca"), from = -3, to = 0),
+            stay("in", listOf("c1"), from = -2, to = 2),
+        )
+
+        assertEquals(HouseAction.CheckIn("arriving", "Guest arriving", "Cabin 2", houseCount = 1), ui.house("c2").action)
+        assertEquals(HouseAction.CheckOut("out", "Guest out", "Casita A", houseCount = 1), ui.house("ca").action)
+        assertEquals(null, ui.house("c1").action)
+        assertEquals(null, ui.house("f1").action)
+    }
+
+    @Test
+    fun `a checked in arrival is occupied for its first night`() {
+        val ui = ui(stay("arriving", listOf("c2"), from = 0, to = 3, checkedIn = true))
+
+        val c2 = ui.house("c2")
+        assertEquals(HouseStatus.OCCUPIED, c2.status)
+        assertEquals(HouseSummary.InHouse("Guest arriving", 1, 3, today.plusDays(3), justCheckedIn = true), c2.summary)
+        assertEquals(null, c2.action)
+        assertEquals(0, ui.arrivingToday)
+        assertEquals(1, ui.occupiedTonight)
+        assertEquals(0, ui.filterCounts[HousesFilter.MOVING])
+    }
+
+    @Test
+    fun `a checked out departure frees the house`() {
+        val ui = ui(stay("out", listOf("ca"), from = -3, to = 0, checkedOut = true))
+
+        val ca = ui.house("ca")
+        assertEquals(HouseStatus.FREE, ca.status)
+        assertEquals(HouseSummary.CheckedOut("Guest out"), ca.summary)
+        assertEquals(null, ca.action)
+        assertEquals(null, ca.bookingId)
+        assertEquals(0, ui.leavingToday)
+    }
+
+    @Test
+    fun `checking in a whole resort stay covers every house`() {
+        val ui = ui(stay("resort", emptyList(), from = 0, to = 2, mode = BookingMode.WHOLE_RESORT))
+
+        assertEquals(4, ui.house("c1").action?.houseCount)
+        assertEquals(4, ui.arrivingToday)
+    }
+
+    @Test
     fun `a whole resort stay occupies every house`() {
         val ui = ui(stay("resort", emptyList(), from = -1, to = 2, mode = BookingMode.WHOLE_RESORT))
 
@@ -127,6 +174,8 @@ class HousesUiMapperTest {
         to: Long,
         mode: BookingMode = BookingMode.INDIVIDUAL,
         status: BookingStatus = BookingStatus.CONFIRMED,
+        checkedIn: Boolean = false,
+        checkedOut: Boolean = false,
     ) = Booking(
         id = id,
         guestName = "Guest $id",
@@ -139,5 +188,7 @@ class HousesUiMapperTest {
         guestCount = 2,
         phone = "",
         note = "",
+        checkedIn = checkedIn,
+        checkedOut = checkedOut,
     )
 }

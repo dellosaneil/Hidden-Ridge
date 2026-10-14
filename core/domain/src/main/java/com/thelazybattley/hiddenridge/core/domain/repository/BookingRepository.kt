@@ -21,4 +21,8 @@ interface BookingRepository {
     suspend fun updateBooking(booking: Booking)
 
     suspend fun deleteBooking(bookingId: String)
+
+    suspend fun setCheckedIn(bookingId: String, checkedIn: Boolean)
+
+    suspend fun setCheckedOut(bookingId: String, checkedOut: Boolean)
 }

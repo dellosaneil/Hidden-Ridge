@@ -27,6 +27,8 @@ internal fun Booking.toEntity(): BookingEntity = BookingEntity(
     guestCount = guestCount,
     phone = phone,
     note = note,
+    checkedIn = checkedIn,
+    checkedOut = checkedOut,
 )
 
 internal fun Booking.toHouseRefs(): List<BookingHouseCrossRef> =
@@ -44,4 +46,6 @@ internal fun BookingWithHouses.toDomain(): Booking = Booking(
     guestCount = booking.guestCount,
     phone = booking.phone,
     note = booking.note,
+    checkedIn = booking.checkedIn,
+    checkedOut = booking.checkedOut,
 )

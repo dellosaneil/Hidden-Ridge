@@ -2,6 +2,7 @@ package com.thelazybattley.hiddenridge.core.database.di
 
 import android.content.Context
 import androidx.room.Room
+import com.thelazybattley.hiddenridge.core.database.DatabaseMigrations
 import com.thelazybattley.hiddenridge.core.database.HiddenRidgeDatabase
 import com.thelazybattley.hiddenridge.core.database.dao.BookingDao
 import com.thelazybattley.hiddenridge.core.database.dao.HouseDao
@@ -21,7 +22,9 @@ internal object DatabaseModule {
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): HiddenRidgeDatabase =
-        Room.databaseBuilder(context, HiddenRidgeDatabase::class.java, DATABASE_NAME).build()
+        Room.databaseBuilder(context, HiddenRidgeDatabase::class.java, DATABASE_NAME)
+            .addMigrations(*DatabaseMigrations.ALL)
+            .build()
 
     @Provides
     fun provideHouseDao(database: HiddenRidgeDatabase): HouseDao = database.houseDao()
