@@ -12,6 +12,7 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.ViewTimeline
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.thelazybattley.hiddenridge.R
+import com.thelazybattley.hiddenridge.feature.houses.navigation.HousesRoute
 import com.thelazybattley.hiddenridge.feature.timeline.navigation.TimelineRoute
 
 /** The bottom navigation tabs. [route] is null for tabs whose screens aren't built yet. */
@@ -23,6 +24,6 @@ enum class TopLevelDestination(
 ) {
     TIMELINE(Icons.Filled.ViewTimeline, Icons.Outlined.ViewTimeline, R.string.nav_timeline, TimelineRoute),
     BOOKINGS(Icons.AutoMirrored.Filled.EventNote, Icons.AutoMirrored.Outlined.EventNote, R.string.nav_bookings, null),
-    HOUSES(Icons.Filled.Cottage, Icons.Outlined.Cottage, R.string.nav_houses, null),
+    HOUSES(Icons.Filled.Cottage, Icons.Outlined.Cottage, R.string.nav_houses, HousesRoute),
     SETTINGS(Icons.Filled.Settings, Icons.Outlined.Settings, R.string.nav_settings, null),
 }

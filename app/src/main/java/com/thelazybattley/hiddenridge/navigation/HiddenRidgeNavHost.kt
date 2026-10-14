@@ -2,14 +2,17 @@ package com.thelazybattley.hiddenridge.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.thelazybattley.hiddenridge.R
 import com.thelazybattley.hiddenridge.feature.availability.navigation.availabilitySheet
 import com.thelazybattley.hiddenridge.feature.availability.navigation.closeAvailability
 import com.thelazybattley.hiddenridge.feature.availability.navigation.navigateToAvailability
 import com.thelazybattley.hiddenridge.feature.bookingdetails.navigation.bookingDetailsSheet
 import com.thelazybattley.hiddenridge.feature.bookingdetails.navigation.closeBookingDetails
 import com.thelazybattley.hiddenridge.feature.bookingdetails.navigation.navigateToBookingDetails
+import com.thelazybattley.hiddenridge.feature.houses.navigation.housesScreen
 import com.thelazybattley.hiddenridge.feature.newbooking.navigation.closeNewBooking
 import com.thelazybattley.hiddenridge.feature.newbooking.navigation.navigateToEditBooking
 import com.thelazybattley.hiddenridge.feature.newbooking.navigation.navigateToNewBooking
@@ -26,6 +29,7 @@ fun HiddenRidgeNavHost(
     onShowMessage: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val notBuiltYetMessage = stringResource(R.string.not_built_yet)
     NavHost(
         navController = navController,
         startDestination = TimelineRoute,
@@ -36,6 +40,12 @@ fun HiddenRidgeNavHost(
             onEmptyDayClick = { houseId, date -> navController.navigateToNewBooking(houseIds = listOf(houseId), checkIn = date) },
             onNewBookingClick = { navController.navigateToNewBooking() },
             onCheckAvailabilityClick = { navController.navigateToAvailability() },
+        )
+        housesScreen(
+            onBookingClick = navController::navigateToBookingDetails,
+            onFreeHouseClick = { houseId, checkIn -> navController.navigateToNewBooking(houseIds = listOf(houseId), checkIn = checkIn) },
+            onSearchClick = { onShowMessage(notBuiltYetMessage) },
+            onAddHouseClick = { onShowMessage(notBuiltYetMessage) },
         )
         bookingDetailsSheet(
             onDismiss = navController::closeBookingDetails,

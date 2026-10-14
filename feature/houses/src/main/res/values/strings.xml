@@ -1,0 +1,51 @@
+<resources>
+    <string name="houses_title">Houses</string>
+    <string name="houses_property_label">Hidden Ridge · today, %1$s</string>
+    <string name="houses_search">Search houses</string>
+    <string name="houses_add">Add</string>
+
+    <string name="houses_occupied_of">of %1$d occupied tonight</string>
+    <string name="houses_free_count">%1$d free</string>
+    <string name="houses_meter_description">%1$d of %2$d houses occupied tonight</string>
+    <string name="houses_arriving_count">%1$d arriving</string>
+    <string name="houses_leaving_count">%1$d leaving</string>
+    <plurals name="houses_hold_count">
+        <item quantity="one">%1$d hold</item>
+        <item quantity="other">%1$d holds</item>
+    </plurals>
+
+    <string name="houses_filter_all">All</string>
+    <string name="houses_filter_free">Free tonight</string>
+    <string name="houses_filter_occupied">Occupied</string>
+    <string name="houses_filter_moving">Arriving / leaving</string>
+
+    <string name="houses_group_cabins">Cabins</string>
+    <string name="houses_group_casitas">Casitas</string>
+    <string name="houses_group_family_houses">Family houses</string>
+    <string name="houses_sleeps">Sleeps %1$d</string>
+
+    <string name="houses_status_occupied">Occupied</string>
+    <string name="houses_status_arriving">Arriving</string>
+    <string name="houses_status_leaving">Leaving</string>
+    <string name="houses_status_free">Free</string>
+
+    <string name="houses_summary_in_house">%1$s · night %2$d of %3$d · out %4$s</string>
+    <string name="houses_summary_arriving">%1$s arrives today · %2$s</string>
+    <string name="houses_summary_leaving">%1$s leaves today · then free</string>
+    <string name="houses_summary_free_until">Free until %1$s · %2$s</string>
+    <string name="houses_summary_free_hold">Free · %1$s hold from %2$s</string>
+    <string name="houses_summary_free_all_week">Free all week</string>
+    <plurals name="houses_nights">
+        <item quantity="one">%1$d night</item>
+        <item quantity="other">%1$d nights</item>
+    </plurals>
+    <string name="houses_row_description">%1$s, %2$s. %3$s</string>
+    <string name="houses_view_booking">View booking</string>
+    <string name="houses_new_booking">New booking</string>
+
+    <string name="houses_empty">No houses match this filter today.</string>
+    <string name="houses_legend_booked">Booked</string>
+    <string name="houses_legend_hold">Hold</string>
+    <string name="houses_legend_free">Free</string>
+    <string name="houses_legend_strip">Strip shows %1$s – %2$s</string>
+</resources>

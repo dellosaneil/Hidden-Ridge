@@ -44,6 +44,7 @@ dependencies {
     implementation(projects.feature.bookingdetails)
     implementation(projects.feature.newbooking)
     implementation(projects.feature.availability)
+    implementation(projects.feature.houses)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
